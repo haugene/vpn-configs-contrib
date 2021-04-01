@@ -32,48 +32,48 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | anonvpn | :sos: (12%) | 8 | 1 |
 | blackvpn | :sos: (0%) | 43 | 0 |
 | btguard | :100: | 2 | 2 |
-| cryptostorm | :warning: (64%) | 53 | 34 |
-| expressvpn | :white_check_mark: (97%) | 60 | 58 |
-| fastestvpn | :100: | 60 | 60 |
+| cryptostorm | :sos: (0%) | 53 | 0 |
+| expressvpn | :white_check_mark: (94%) | 148 | 139 |
+| fastestvpn | :white_check_mark: (96%) | 114 | 110 |
 | freevpn | :sos: (0%) | 29 | 0 |
 | froot | :100: | 7 | 7 |
-| frostvpn | :warning: (42%) | 60 | 25 |
-| getflix | :100: | 60 | 60 |
-| ghostpath | :ok: (78%) | 60 | 47 |
-| giganews | :white_check_mark: (98%) | 60 | 59 |
-| hideme | :white_check_mark: (90%) | 60 | 54 |
-| hidemyass | :warning: (50%) | 60 | 30 |
+| frostvpn | :warning: (46%) | 275 | 127 |
+| getflix | :white_check_mark: (99%) | 1377 | 1370 |
+| ghostpath | :ok: (79%) | 90 | 71 |
+| giganews | :white_check_mark: (99%) | 148 | 146 |
+| hideme | :white_check_mark: (91%) | 64 | 58 |
+| hidemyass | :ok: (74%) | 535 | 395 |
 | integrityvpn | :100: | 1 | 1 |
 | ironsocket | :white_check_mark: (98%) | 42 | 41 |
-| ivacy | :warning: (57%) | 60 | 34 |
-| ivpn | :white_check_mark: (98%) | 47 | 46 |
+| ivacy | :ok: (70%) | 101 | 71 |
+| ivpn | :white_check_mark: (96%) | 47 | 45 |
 | mullvad | :100: | 49 | 49 |
-| octanevpn | :ok: (73%) | 60 | 44 |
+| octanevpn | :ok: (76%) | 91 | 69 |
 | ovpn | :100: | 4 | 4 |
-| privado | :white_check_mark: (93%) | 60 | 56 |
-| privatevpn | :ok: (82%) | 60 | 49 |
-| protonvpn | :100: | 60 | 60 |
+| privado | :white_check_mark: (95%) | 188 | 178 |
+| privatevpn | :ok: (78%) | 533 | 415 |
+| protonvpn | :100: | 406 | 406 |
 | proxpn | :sos: (12%) | 25 | 3 |
-| purevpn | :ok: (78%) | 60 | 47 |
-| ra4w | :ok: (73%) | 60 | 44 |
-| safervpn | :warning: (50%) | 60 | 30 |
-| slickvpn | :100: | 60 | 60 |
-| smartdnsproxy | :white_check_mark: (98%) | 60 | 59 |
+| purevpn | :ok: (80%) | 105 | 84 |
+| ra4w | :ok: (77%) | 69 | 53 |
+| safervpn | :warning: (46%) | 71 | 33 |
+| slickvpn | :100: | 92 | 92 |
+| smartdnsproxy | :white_check_mark: (98%) | 1281 | 1260 |
 | smartvpn | :100: | 3 | 3 |
-| surfshark | :white_check_mark: (90%) | 60 | 54 |
+| surfshark | :white_check_mark: (95%) | 295 | 279 |
 | tiger | :100: | 42 | 42 |
-| torguard | :white_check_mark: (96%) | 53 | 51 |
-| trustzone | :sos: (0%) | 60 | 0 |
+| torguard | :white_check_mark: (91%) | 53 | 48 |
+| trustzone | :ok: (81%) | 70 | 57 |
 | tunnelbear | :white_check_mark: (96%) | 23 | 22 |
-| vpnac | :100: | 60 | 60 |
-| vpnarea | :warning: (63%) | 60 | 38 |
+| vpnac | :white_check_mark: (98%) | 385 | 379 |
+| vpnarea | :warning: (64%) | 135 | 87 |
 | vpnbook | :100: | 9 | 9 |
 | vpnfacile | :100: | 55 | 55 |
 | vpnht | :100: | 48 | 48 |
-| vpntunnel | :white_check_mark: (98%) | 60 | 59 |
-| vpnunlimited | :white_check_mark: (97%) | 60 | 58 |
-| windscribe | :white_check_mark: (93%) | 60 | 56 |
-| zoogvpn | :sos: (0%) | 60 | 0 |
+| vpntunnel | :100: | 126 | 126 |
+| vpnunlimited | :white_check_mark: (99%) | 68 | 67 |
+| windscribe | :white_check_mark: (98%) | 357 | 350 |
+| zoogvpn | :sos: (0%) | 99 | 0 |
 
 ## Config testing
 
