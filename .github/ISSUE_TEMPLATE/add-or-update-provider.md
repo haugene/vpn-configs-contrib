@@ -38,7 +38,5 @@ assignees: ''
 <!-- Write inside the code block -->
 <!-- Add any other context or screenshots about the feature request here. -->
 *Optional*
-```txt
-<placeholder for optional>
-```
+``` <placeholder for optional> ```
 <!-- check *Preview Issue* before submitting -->
