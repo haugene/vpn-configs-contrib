@@ -53,20 +53,24 @@ for config_path in Path(base_dir).rglob("*.ovpn"):
         )
     except Exception:
         server_responded = False
+        auth_failed = None
+        resolve_error = None
+        retry_max = None
+    else:
+        server_responded = True if "Peer Connection Initiated" in process.stdout else False
+        auth_failed = True if "AUTH_FAILED" in process.stdout else False
+        resolve_error = (
+            True if "RESOLVE: Cannot resolve host address" in process.stdout else False
+        )
+
+        retry_max_regex = re.compile(
+            "All connections have been connect-retry-max .* times unsuccessful, exiting"
+        )
+        retry_max = True if retry_max_regex.search(process.stdout) else False
+
+        print(process.stdout)
+
     stop = time.perf_counter()
-
-    server_responded = True if "Peer Connection Initiated" in process.stdout else False
-    auth_failed = True if "AUTH_FAILED" in process.stdout else False
-    resolve_error = (
-        True if "RESOLVE: Cannot resolve host address" in process.stdout else False
-    )
-
-    retry_max_regex = re.compile(
-        "All connections have been connect-retry-max .* times unsuccessful, exiting"
-    )
-    retry_max = True if retry_max_regex.search(process.stdout) else False
-
-    print(process.stdout)
 
     results["providers"][provider][str(config)] = {}
     results["providers"][provider][str(config)]["responded"] = server_responded
