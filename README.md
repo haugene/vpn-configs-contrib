@@ -34,40 +34,40 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | btguard | :100: | 2 | 2 |
 | cryptostorm | :sos: (0%) | 10 | 0 |
 | expressvpn | :100: | 10 | 10 |
-| fastestvpn | :white_check_mark: (90%) | 10 | 9 |
+| fastestvpn | :ok: (80%) | 10 | 8 |
 | freevpn | :sos: (0%) | 10 | 0 |
 | froot | :100: | 7 | 7 |
-| frostvpn | :warning: (50%) | 10 | 5 |
+| frostvpn | :warning: (60%) | 10 | 6 |
 | getflix | :white_check_mark: (90%) | 10 | 9 |
 | ghostpath | :ok: (80%) | 10 | 8 |
 | giganews | :100: | 10 | 10 |
 | hideme | :100: | 10 | 10 |
 | hidemyass | :ok: (70%) | 10 | 7 |
-| integrityvpn | :100: | 1 | 1 |
+| integrityvpn | :sos: (0%) | 1 | 0 |
 | ironsocket | :white_check_mark: (90%) | 10 | 9 |
 | ivacy | :warning: (60%) | 10 | 6 |
-| ivpn | :ok: (80%) | 10 | 8 |
+| ivpn | :white_check_mark: (90%) | 10 | 9 |
 | mullvad | :100: | 10 | 10 |
 | octanevpn | :ok: (80%) | 10 | 8 |
 | ovpn | :100: | 4 | 4 |
-| privado | :white_check_mark: (90%) | 10 | 9 |
-| privatevpn | :warning: (50%) | 10 | 5 |
-| protonvpn | :white_check_mark: (90%) | 10 | 9 |
+| privado | :ok: (80%) | 10 | 8 |
+| privatevpn | :warning: (40%) | 10 | 4 |
+| protonvpn | :100: | 10 | 10 |
 | proxpn | :sos: (0%) | 10 | 0 |
 | purevpn | :ok: (70%) | 10 | 7 |
 | ra4w | :sos: (10%) | 10 | 1 |
 | safervpn | :warning: (50%) | 10 | 5 |
-| slickvpn | :warning: (60%) | 10 | 6 |
+| slickvpn | :warning: (40%) | 10 | 4 |
 | smartdnsproxy | :100: | 10 | 10 |
 | smartvpn | :warning: (33%) | 3 | 1 |
-| surfshark | :ok: (70%) | 10 | 7 |
+| surfshark | :ok: (80%) | 10 | 8 |
 | tiger | :100: | 10 | 10 |
-| torguard | :ok: (80%) | 10 | 8 |
+| torguard | :warning: (60%) | 10 | 6 |
 | trustzone | :sos: (0%) | 10 | 0 |
 | tunnelbear | :100: | 10 | 10 |
 | vpnac | :white_check_mark: (90%) | 10 | 9 |
 | vpnarea | :warning: (50%) | 10 | 5 |
-| vpnbook | :100: | 9 | 9 |
+| vpnbook | :ok: (78%) | 9 | 7 |
 | vpnfacile | :white_check_mark: (90%) | 10 | 9 |
 | vpnht | :sos: (0%) | 10 | 0 |
 | vpntunnel | :ok: (70%) | 10 | 7 |
