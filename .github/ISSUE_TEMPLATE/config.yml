@@ -2,4 +2,4 @@ blank_issues_enabled: false
 contact_links:
   - name: Docker transmission problems/bugs
     url: https://github.com/haugene/docker-transmission-openvpn/issues
-    about: This is the issue tracker for our providers. Please report issues with the backend on the main repo.
+    about: This is the issue tracker for our providers. Please report issues with the container on the main repo.

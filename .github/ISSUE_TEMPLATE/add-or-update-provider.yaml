@@ -1,0 +1,43 @@
+name: Add or update provider
+description: Request for a new provider or update configs for an existing provider.
+labels: [Add/update provider]
+body:
+- type: checkboxes
+  attributes:
+    label: Do you have the latest provider files?
+    description: Have you checked that the provider configs are the latest?
+    options:
+    - label: I have checked that the provider are the latest
+      required: true
+- type: checkboxes
+  attributes:
+    label: Have you tested the provider files?
+    description: Please make sure to test the provider files first, using the CUSTOM provider option
+    options:
+    - label: I have tested the provider files
+      required: true
+- type: checkboxes
+  attributes:
+    label: Can you create a PR for this config?
+    description: Please try to create a PR for the configs yourself first, see previous ones for help
+    options:
+    - label: I can create a PR for this
+      required: false
+- type: textarea
+  attributes:
+    label: Provider details
+    description: |
+      Please describe the provider details (name/url etc) as well as any special requirements
+
+      Tip: You can attach images by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Anything else?
+    description: |
+      Links? References? Anything that will give us more context about the issue you are encountering!
+
+      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: false
