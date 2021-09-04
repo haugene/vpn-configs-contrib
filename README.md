@@ -7,7 +7,10 @@ VPN configs it relies on.
 The split is thought to have multiple benefits. It will reduce noice in the main project and
 hopefully create a meaningful separation that can make it easier to test changes in configs and contribute to keep the providers up to date.
 
-This is a work in progress, and the README will be updated later...
+## Use your own config
+
+If you have a `.ovpn` file from your VPN provider and you want to use it with this project
+then [CONTRIBUTING.md](CONTRIBUTING.md) is the guide you're looking for.
 
 ## Structure
 
