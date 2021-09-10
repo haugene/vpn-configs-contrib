@@ -7,6 +7,7 @@
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
 
 transmission_username=$(head -1 $TRANSMISSION_PASSWD_FILE)
+transmission_username="${transmission_username:=transmission}" #for the case that default username is set, this doesn't seem to be written to passwd file
 transmission_passwd=$(tail -1 $TRANSMISSION_PASSWD_FILE)
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
 

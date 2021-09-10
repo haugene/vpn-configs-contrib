@@ -1,0 +1,15 @@
+version: '3.3'
+services:
+  vpn-config-tester:
+    container_name: configtest
+    volumes:
+      - ./data/:/tmp/data
+      - ./openvpn:/etc/openvpn:ro
+      - ./provider_test.py:/app/provider_test.py:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    image: haugene/transmission-openvpn:dev
+    command: python3 -u /app/provider_test.py
+
