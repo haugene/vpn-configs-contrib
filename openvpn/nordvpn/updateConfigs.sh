@@ -60,9 +60,10 @@ country_filter() { # curl -s "https://api.nordvpn.com/v1/servers/countries" | jq
 group_filter() { # curl -s "https://api.nordvpn.com/v1/servers/groups" | jq --raw-output '.[] | [.identifier, .title] | @tsv'
   local nordvpn_api=$1 category=(${NORDVPN_CATEGORY//[;,]/ })
   if [[ ${#category[@]} -ge 1 ]]; then
-    category=${category[0]//_/ }
+    #category=${category[0]//_/ }
     local identifier=$(curl -s "${nordvpn_api}/v1/servers/groups" | jq --raw-output ".[] |
-                          select( .title | test(\"${category}\";\"i\") ) |
+                          select( ( .identifier|test(\"${category}\";\"i\")) or
+                                  ( .title| test(\"${category}\";\"i\")) ) |
                           .identifier" | head -n 1)
     if [[ -n ${identifier} ]]; then
       log "Searching for group: ${identifier}"
