@@ -107,3 +107,53 @@ Then you can generate the markdown table by running:
 python3 generate_results_md_table.py data/result1234.json >> README.md
 ```
 Or something similar depending on the data file you want to use.
+| Provider Folder | Provider Status | Configs tested | Successful |
+| :-------------- | :-------------: | :------------: | :--------: |
+| anonine | :sos: (10%) | 10 | 1 |
+| anonvpn | :sos: (12%) | 8 | 1 |
+| blackvpn | :sos: (0%) | 10 | 0 |
+| btguard | :100: | 2 | 2 |
+| cryptostorm | :sos: (0%) | 10 | 0 |
+| expressvpn | :ok: (80%) | 10 | 8 |
+| fastestvpn | :100: | 10 | 10 |
+| freevpn | :sos: (0%) | 10 | 0 |
+| froot | :100: | 7 | 7 |
+| frostvpn | :warning: (50%) | 10 | 5 |
+| getflix | :100: | 10 | 10 |
+| ghostpath | :ok: (70%) | 10 | 7 |
+| giganews | :100: | 10 | 10 |
+| goosevpn | :100: | 10 | 10 |
+| hideme | :100: | 10 | 10 |
+| hidemyass | :warning: (60%) | 10 | 6 |
+| integrityvpn | :100: | 1 | 1 |
+| ironsocket | :white_check_mark: (90%) | 10 | 9 |
+| ivacy | :warning: (40%) | 10 | 4 |
+| ivpn | :100: | 10 | 10 |
+| mullvad | :100: | 10 | 10 |
+| octanevpn | :ok: (70%) | 10 | 7 |
+| ovpn | :100: | 4 | 4 |
+| privado | :100: | 10 | 10 |
+| privatevpn | :warning: (60%) | 10 | 6 |
+| protonvpn | :ok: (70%) | 10 | 7 |
+| proxpn | :sos: (0%) | 10 | 0 |
+| purevpn | :warning: (60%) | 10 | 6 |
+| ra4w | :sos: (10%) | 10 | 1 |
+| safervpn | :warning: (40%) | 10 | 4 |
+| slickvpn | :warning: (60%) | 10 | 6 |
+| smartdnsproxy | :white_check_mark: (90%) | 10 | 9 |
+| smartvpn | :warning: (33%) | 3 | 1 |
+| surfshark | :ok: (70%) | 10 | 7 |
+| tiger | :ok: (80%) | 10 | 8 |
+| torguard | :white_check_mark: (90%) | 10 | 9 |
+| trustzone | :sos: (0%) | 10 | 0 |
+| tunnelbear | :100: | 10 | 10 |
+| vpnac | :100: | 10 | 10 |
+| vpnarea | :warning: (50%) | 10 | 5 |
+| vpnbook | :100: | 9 | 9 |
+| vpnfacile | :white_check_mark: (90%) | 10 | 9 |
+| vpnht | :sos: (0%) | 10 | 0 |
+| vpntunnel | :100: | 10 | 10 |
+| vpnunlimited | :100: | 10 | 10 |
+| wevpn | :100: | 10 | 10 |
+| windscribe | :100: | 10 | 10 |
+| zoogvpn | :sos: (0%) | 10 | 0 |
