@@ -19,6 +19,8 @@
 # 2021/09/22: store json results, merged configure-openvpn + updateConfigs.sh: OPENVPN_CONFIG is confusing for users. (#1958)
 
 set -e
+[[ -f /etc/openvpn/utils.sh ]] && source /etc/openvpn/utils.sh || true
+
 #Variables
 TIME_FORMAT=$(date "+%Y-%m-%d %H:%M:%S")
 nordvpn_api="https://api.nordvpn.com"
@@ -38,26 +40,25 @@ json_technologies=$(curl -s ${nordvpn_api}/v1/technologies)
 possible_categories="$(echo ${json_groups} | jq -r .[].identifier | tr '\n' ', ')"
 possible_country_codes="$(echo ${json_countries} | jq -r .[].code | tr '\n' ', ')"
 possible_country_names="$(echo ${json_countries} | jq -r .[].name | tr '\n' ', ')"
-possible_protocol="$(echo ${json_technologies} | jq -r '.[] | [.identifier, .name ]' | tr '\n' ', ' | grep openvpn )"
-
+possible_protocol="$(echo ${json_technologies} | jq -r '.[] | [.identifier, .name ]' | tr '\n' ', ' | grep openvpn)"
 
 # Functions
 # TESTS: set values to test API response.
-test1NoValues(){
+test1NoValues() {
   export NORDVPN_COUNTRY=''
   export NORDVPN_PROTOCOL=''
   export NORDVPN_CATEGORY=''
   log "expected <your country code><NN>.nordvpn.com.ovpn with openvpn_udp"
 }
 
-test2NoValues(){
+test2NoCategory() {
   export NORDVPN_COUNTRY='EE'
   export NORDVPN_PROTOCOL='tcp'
   export NORDVPN_CATEGORY=''
   log "expected ee<NN>.nordvpn.com.ovpn with openvpn_tcp"
 }
 
-test3Incompatible_combinations(){
+test3Incompatible_combinations() {
   export NORDVPN_COUNTRY='EE'
   export NORDVPN_PROTOCOL='openvpn_tcp_tls_crypt'
   export NORDVPN_CATEGORY='legacy_obfuscated_servers'
@@ -146,44 +147,48 @@ select_hostname() { #TODO return multiples
 
   hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?${filters}limit=1" | jq --raw-output ".[].hostname")
   if [[ -z ${hostname} ]]; then
-    log "Unable to find a server with the specified parameters, using any recommended server"
-    hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?limit=1" | jq --raw-output ".[].hostname")
+    log "Warning, unable to find a server with the specified parameters, please review your parameters, NORDVPN_COUNTRY=${NORDVPN_COUNTRY}, NORDVPN_CATEGORY=${NORDVPN_CATEGORY}, NORDVPN_PROTOCOL=${NORDVPN_PROTOCOL}"
+    #hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?limit=1" | jq --raw-output ".[].hostname")
+    echo ''
+  else
+    load=$(curl --silent ${nordvpn_api}/server/stats/${hostname} | jq .percent)
+    log "Best server : ${hostname}, load: ${load}"
+    echo ${hostname}
   fi
-
-  log "Best server : ${hostname}"
-  echo ${hostname}
 }
 download_hostname() {
   #udp ==> https://downloads.nordcdn.com/configs/files/ovpn_udp/servers/nl601.nordvpn.com.udp.ovpn
   #tcp ==> https://downloads.nordcdn.com/configs/files/ovpn_tcp/servers/nl542.nordvpn.com.tcp.ovpn
+  [[ -z ${1} ]] && return || true
   local nordvpn_cdn=${nordvpn_cdn}
   #which protocol tcp or udp
-  if [[ ${NORDVPN_PROTOCOL,,} == udp ]]; then
-    nordvpn_cdn="${nordvpn_cdn}/ovpn_udp/servers/"
-  elif [[ ${NORDVPN_PROTOCOL,,} == tcp ]]; then
+  if [[ ${NORDVPN_PROTOCOL,,} == tcp ]]; then
     nordvpn_cdn="${nordvpn_cdn}/ovpn_tcp/servers/"
   else
-    # defaulting to tcp
-    nordvpn_cdn="${nordvpn_cdn}/ovpn_tcp/servers/"
+    nordvpn_cdn="${nordvpn_cdn}/ovpn_udp/servers/"
   fi
 
   # default or defined server name
-    nordvpn_cdn=${nordvpn_cdn}${1}
-    ovpnName=${1}.ovpn
+  nordvpn_cdn=${nordvpn_cdn}${1}
+  ovpnName=${1}.ovpn
 
   # remote filename
-  if [[ ${NORDVPN_PROTOCOL,,} == udp ]]; then
-    nordvpn_cdn="${nordvpn_cdn}.udp.ovpn"
-  elif [[ ${NORDVPN_PROTOCOL,,} == tcp ]]; then
+  if [[ ${NORDVPN_PROTOCOL,,} == tcp ]]; then
     nordvpn_cdn="${nordvpn_cdn}.tcp.ovpn"
   else
-    nordvpn_cdn="${nordvpn_cdn}.tcp.ovpn"
+    nordvpn_cdn="${nordvpn_cdn}.udp.ovpn"
   fi
 
   log "Downloading config: ${ovpnName}"
   log "Downloading from: ${nordvpn_cdn}"
   # VPN_PROVIDER_HOME defined is openvpn/start.sh
-  curl -sSL ${nordvpn_cdn} -o "${VPN_PROVIDER_HOME}/${ovpnName}"
+  outfile="-o "${VPN_PROVIDER_HOME}/${ovpnName}
+  #when testing script outside of container, display config instead of writing it.
+  if [ ! -w ${VPN_PROVIDER_HOME} ]; then
+    log "${VPN_PROVIDER_HOME} is not writable, outputing to stdout"
+    unset outfile
+  fi
+  curl -sSL ${nordvpn_cdn} ${outfile}
 }
 
 checkDNS() {
@@ -210,15 +215,33 @@ script_init
 checkDNS
 
 log "Removing existing configs in ${VPN_PROVIDER_HOME}"
-find ${VPN_PROVIDER_HOME} ! -name '*.sh' -type f -delete
+#find ${VPN_PROVIDER_HOME} -type f ! -name '*.sh' -delete
 
 #Tests NORDVPN_<COUNTRY, PROTOCOL, CATEGORY> values
-#test1NoValues
-#test2NoValues
-#test3Incompatible_combinations
+if [[ -n ${NORDVPN_TESTS:-""} ]]; then
+
+  case ${NORDVPN_TESTS} in
+  1)
+    #get recommended config when no values are given, use defaults one, display a warning with possible values
+    test1NoValues
+    ;;
+  2)
+    #When no category, get recommended config, display warning with possible values
+    test2NoCategory
+    ;;
+  3)
+    #When incompatibles combinations, no recommended config is given, exit with error log.
+    test3Incompatible_combinations
+    ;;
+  *)
+    log "Warning, tests requested but not found: NORDVPN_TESTS=${NORDVPN_TESTS}"
+    ;;
+  esac
+fi
 
 #get server name from api (best recommended for NORDVPN_<> if defined)
 selected="$(select_hostname)"
+
 download_hostname ${selected}
 export OPENVPN_CONFIG=${selected}
 
