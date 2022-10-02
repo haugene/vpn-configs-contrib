@@ -107,3 +107,56 @@ Then you can generate the markdown table by running:
 python3 generate_results_md_table.py data/result1234.json >> README.md
 ```
 Or something similar depending on the data file you want to use.
+| Provider Folder | Provider Status | Configs tested | Successful |
+| :-------------- | :-------------: | :------------: | :--------: |
+| anonine | :sos: (0%) | 10 | 0 |
+| anonvpn | :sos: (0%) | 8 | 0 |
+| blackvpn | :sos: (0%) | 10 | 0 |
+| btguard | :100: | 2 | 2 |
+| bulletvpn | :ok: (70%) | 10 | 7 |
+| cryptostorm | :100: | 10 | 10 |
+| expressvpn | :white_check_mark: (90%) | 10 | 9 |
+| fastestvpn | :ok: (80%) | 10 | 8 |
+| freevpn | :sos: (0%) | 10 | 0 |
+| froot | :100: | 7 | 7 |
+| frostvpn | :sos: (0%) | 10 | 0 |
+| getflix | :ok: (80%) | 10 | 8 |
+| ghostpath | :ok: (70%) | 10 | 7 |
+| giganews | :100: | 10 | 10 |
+| goosevpn | :warning: (60%) | 10 | 6 |
+| hideme | :ok: (80%) | 10 | 8 |
+| hidemyass | :warning: (30%) | 10 | 3 |
+| hotspotshield | :100: | 10 | 10 |
+| integrityvpn | :100: | 1 | 1 |
+| ironsocket | :ok: (80%) | 10 | 8 |
+| ivacy | :white_check_mark: (90%) | 10 | 9 |
+| ivpn | :100: | 10 | 10 |
+| mullvad | :ok: (70%) | 10 | 7 |
+| octanevpn | :ok: (70%) | 10 | 7 |
+| ovpn | :ok: (80%) | 10 | 8 |
+| privado | :ok: (70%) | 10 | 7 |
+| privatevpn | :ok: (80%) | 10 | 8 |
+| protonvpn | :100: | 10 | 10 |
+| proxpn | :sos: (0%) | 10 | 0 |
+| purevpn | :100: | 10 | 10 |
+| ra4w | :sos: (0%) | 10 | 0 |
+| safervpn | :warning: (50%) | 10 | 5 |
+| slickvpn | :ok: (70%) | 10 | 7 |
+| slickvpncore | :white_check_mark: (90%) | 10 | 9 |
+| smartdnsproxy | :ok: (80%) | 10 | 8 |
+| smartvpn | :warning: (33%) | 3 | 1 |
+| surfshark | :100: | 10 | 10 |
+| tiger | :sos: (0%) | 10 | 0 |
+| torguard | :ok: (70%) | 10 | 7 |
+| trustzone | :sos: (0%) | 10 | 0 |
+| tunnelbear | :ok: (80%) | 10 | 8 |
+| vpnac | :100: | 10 | 10 |
+| vpnarea | :warning: (60%) | 10 | 6 |
+| vpnbook | :100: | 9 | 9 |
+| vpnfacile | :sos: (0%) | 10 | 0 |
+| vpnht | :sos: (0%) | 10 | 0 |
+| vpntunnel | :ok: (80%) | 10 | 8 |
+| vpnunlimited | :100: | 10 | 10 |
+| wevpn | :100: | 10 | 10 |
+| windscribe | :warning: (60%) | 10 | 6 |
+| zoogvpn | :sos: (0%) | 10 | 0 |
