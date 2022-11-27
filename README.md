@@ -32,52 +32,57 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | Provider Folder | Provider Status | Configs tested | Successful |
 | :-------------- | :-------------: | :------------: | :--------: |
 | anonine | :sos: (0%) | 10 | 0 |
-| anonvpn | :sos: (12%) | 8 | 1 |
+| anonvpn | :sos: (0%) | 8 | 0 |
 | blackvpn | :sos: (0%) | 10 | 0 |
 | btguard | :100: | 2 | 2 |
-| cryptostorm | :sos: (0%) | 10 | 0 |
-| expressvpn | :100: | 10 | 10 |
+| bulletvpn | :ok: (70%) | 10 | 7 |
+| cryptostorm | :100: | 10 | 10 |
+| expressvpn | :white_check_mark: (90%) | 10 | 9 |
 | fastestvpn | :ok: (80%) | 10 | 8 |
 | freevpn | :sos: (0%) | 10 | 0 |
 | froot | :100: | 7 | 7 |
-| frostvpn | :warning: (60%) | 10 | 6 |
-| getflix | :white_check_mark: (90%) | 10 | 9 |
-| ghostpath | :ok: (80%) | 10 | 8 |
+| frostvpn | :sos: (0%) | 10 | 0 |
+| getflix | :ok: (80%) | 10 | 8 |
+| ghostpath | :ok: (70%) | 10 | 7 |
 | giganews | :100: | 10 | 10 |
-| hideme | :100: | 10 | 10 |
-| hidemyass | :ok: (70%) | 10 | 7 |
-| integrityvpn | :sos: (0%) | 1 | 0 |
-| ironsocket | :white_check_mark: (90%) | 10 | 9 |
-| ivacy | :warning: (60%) | 10 | 6 |
-| ivpn | :white_check_mark: (90%) | 10 | 9 |
-| mullvad | :100: | 10 | 10 |
-| octanevpn | :ok: (80%) | 10 | 8 |
-| ovpn | :100: | 4 | 4 |
-| privado | :ok: (80%) | 10 | 8 |
-| privatevpn | :warning: (40%) | 10 | 4 |
+| goosevpn | :warning: (60%) | 10 | 6 |
+| hideme | :ok: (80%) | 10 | 8 |
+| hidemyass | :warning: (30%) | 10 | 3 |
+| hotspotshield | :100: | 10 | 10 |
+| integrityvpn | :100: | 1 | 1 |
+| ironsocket | :ok: (80%) | 10 | 8 |
+| ivacy | :white_check_mark: (90%) | 10 | 9 |
+| ivpn | :100: | 10 | 10 |
+| mullvad | :ok: (70%) | 10 | 7 |
+| octanevpn | :ok: (70%) | 10 | 7 |
+| ovpn | :ok: (80%) | 10 | 8 |
+| privado | :ok: (70%) | 10 | 7 |
+| privatevpn | :ok: (80%) | 10 | 8 |
 | protonvpn | :100: | 10 | 10 |
 | proxpn | :sos: (0%) | 10 | 0 |
-| purevpn | :ok: (70%) | 10 | 7 |
-| ra4w | :sos: (10%) | 10 | 1 |
+| purevpn | :100: | 10 | 10 |
+| ra4w | :sos: (0%) | 10 | 0 |
 | safervpn | :warning: (50%) | 10 | 5 |
-| slickvpn | :warning: (40%) | 10 | 4 |
-| smartdnsproxy | :100: | 10 | 10 |
+| slickvpn | :ok: (70%) | 10 | 7 |
+| slickvpncore | :white_check_mark: (90%) | 10 | 9 |
+| smartdnsproxy | :ok: (80%) | 10 | 8 |
 | smartvpn | :warning: (33%) | 3 | 1 |
-| surfshark | :ok: (80%) | 10 | 8 |
-| tiger | :100: | 10 | 10 |
-| torguard | :warning: (60%) | 10 | 6 |
+| surfshark | :100: | 10 | 10 |
+| tiger | :sos: (0%) | 10 | 0 |
+| torguard | :ok: (70%) | 10 | 7 |
 | trustzone | :sos: (0%) | 10 | 0 |
-| tunnelbear | :100: | 10 | 10 |
-| vpnac | :white_check_mark: (90%) | 10 | 9 |
-| vpnarea | :warning: (50%) | 10 | 5 |
-| vpnbook | :ok: (78%) | 9 | 7 |
-| vpnfacile | :white_check_mark: (90%) | 10 | 9 |
+| tunnelbear | :ok: (80%) | 10 | 8 |
+| vpnac | :100: | 10 | 10 |
+| vpnarea | :warning: (60%) | 10 | 6 |
+| vpnbook | :100: | 9 | 9 |
+| vpnfacile | :sos: (0%) | 10 | 0 |
 | vpnht | :sos: (0%) | 10 | 0 |
-| vpntunnel | :ok: (70%) | 10 | 7 |
-| vpnunlimited | :white_check_mark: (90%) | 10 | 9 |
+| vpntunnel | :ok: (80%) | 10 | 8 |
+| vpnunlimited | :100: | 10 | 10 |
 | wevpn | :100: | 10 | 10 |
-| windscribe | :100: | 10 | 10 |
+| windscribe | :warning: (60%) | 10 | 6 |
 | zoogvpn | :sos: (0%) | 10 | 0 |
+
 
 ## Config testing
 
