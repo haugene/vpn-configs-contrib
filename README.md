@@ -47,7 +47,6 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | giganews | :100: | 10 | 10 |
 | goosevpn | :warning: (60%) | 10 | 6 |
 | hideme | :ok: (80%) | 10 | 8 |
-| hidemyass | :warning: (30%) | 10 | 3 |
 | hotspotshield | :100: | 10 | 10 |
 | integrityvpn | :100: | 1 | 1 |
 | ironsocket | :ok: (80%) | 10 | 8 |
