@@ -77,7 +77,7 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | vpnfacile | :sos: (0%) | 10 | 0 |
 | vpnht | :sos: (0%) | 10 | 0 |
 | vpntunnel | :ok: (80%) | 10 | 8 |
-| vpnunlimited | :100: | 10 | 10 |
+| vpnunlimited | :ok: (87%) | 77 | 67 |
 | wevpn | :100: | 10 | 10 |
 | windscribe | :warning: (60%) | 10 | 6 |
 | zoogvpn | :sos: (0%) | 10 | 0 |
