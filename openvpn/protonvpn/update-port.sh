@@ -9,7 +9,7 @@ echo "-------------------------"
 echo "ProtonVPN Port Forwarding"
 echo "-------------------------"
 
-# this function borrow verbatim from openvpn/pia/update-port.sh
+# this function borrowed verbatim from openvpn/pia/update-port.sh
 bind_trans() {
 	new_port=$pf_port
 	#
