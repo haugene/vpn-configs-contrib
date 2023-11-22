@@ -43,3 +43,5 @@ environment:
   - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
 ...   
 ```
+
+> Note that in order to use ProtonVPN port forwarding functionality it is mandatory to use the sufix `+pmp` in the username field. For example: if your username is `protonvpnuser` you should use `protonvpnuser+pmp`. If not, you will get `readnatpmpresponseorretry() failed : the gateway does not support nat-pmp` error.
