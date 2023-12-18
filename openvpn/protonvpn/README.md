@@ -16,6 +16,8 @@ This script has been manually tested to work with the following ProtonVPN config
 - ch.protonvpn.net.udp
 - es.protonvpn.net.tcp
 - es.protonvpn.net.udp
+- fr.protonvpn.net.udp
+- fr.protonvpn.net.udp
 - is.protonvpn.net.tcp
 - is.protonvpn.net.udp
 - ng.protonvpn.net.tcp
