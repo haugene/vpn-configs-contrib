@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 #
 #
 . /etc/transmission/environment-variables.sh
@@ -13,9 +13,12 @@ echo "-------------------------"
 echo "ProtonVPN Port Forwarding"
 echo "-------------------------"
 
-# this function borrowed verbatim from openvpn/pia/update-port.sh
+# this function borrowed from openvpn/pia/update-port.sh
 bind_trans() {
 	new_port=$pf_port
+	local transmission_port_check_max_attempts=50
+	local transmission_port_check_attempts=0
+	local transmission_port_check_interval=10
 	#
 	# Now, set port in Transmission
 	#
@@ -57,8 +60,14 @@ bind_trans() {
 
 		echo "Waiting for port..."
 		until [[ $(transmission-remote ${TRANSMISSION_RPC_PORT} ${myauth} -pt | grep -ioE 'yes|no' | tr '[:upper:]' '[:lower:]') == "yes" ]]; do
-			echo "Port is not open yet, waiting 10 seconds..."
-			sleep 10
+			if [[ $transmission_port_check_attempts -ge $transmission_port_check_max_attempts ]]; then
+				echo "Port check attempts exceeded, giving up..."
+				return 1
+			else
+			 	printf "Attempt %s of %s. Port is not open yet, waiting 10 seconds...\n" $(( $transmission_port_check_attempts + 1 )) $transmission_port_check_max_attempts
+				((transmission_port_check_attempts++))
+				sleep $transmission_port_check_interval
+			fi
 		done
 		echo "Port is open!"
 	else
@@ -66,7 +75,7 @@ bind_trans() {
 	fi
 }
 
-# Check that natpmpc is inatalled.
+# Check that natpmpc is installed.
 
 which natpmpc 2>/dev/null
 if [ $? -gt 0 ]; then
@@ -93,10 +102,15 @@ while true; do
 		echo "No port retuned from natpmpc"
 		echo "----------------------------"
 	else
-		bind_trans
-		echo "----------------------------"
-		echo "THE FORWARDED PORT IS: ${pf_port}"
-		echo "----------------------------"
+		bind_trans && {
+			echo "----------------------------"
+			echo "THE FORWARDED PORT IS: $pf_port"
+			echo "----------------------------"
+		} || {
+			echo "----------------------------"
+			echo "THE FORWARDED PORT IS: Unavailable"
+			echo "----------------------------"
+		}
 	fi
 
 	sleep 35
