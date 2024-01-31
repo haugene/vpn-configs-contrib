@@ -13,9 +13,12 @@ echo "-------------------------"
 echo "ProtonVPN Port Forwarding"
 echo "-------------------------"
 
-# this function borrowed verbatim from openvpn/pia/update-port.sh
+# this function borrowed from openvpn/pia/update-port.sh
 bind_trans() {
 	new_port=$pf_port
+	local transmission_port_check_max_attempts=50
+	local transmission_port_check_attempts=0
+	local transmission_port_check_interval=10
 	#
 	# Now, set port in Transmission
 	#
@@ -55,15 +58,24 @@ bind_trans() {
 		echo "setting transmission port to $new_port"
 		transmission-remote ${TRANSMISSION_RPC_PORT} ${myauth} -p "$new_port"
 
-		echo "Checking port..."
-		sleep 10
-		transmission-remote ${TRANSMISSION_RPC_PORT} ${myauth} -pt
+		echo "Waiting for port..."
+		until [[ $(transmission-remote ${TRANSMISSION_RPC_PORT} ${myauth} -pt | grep -ioE 'yes|no' | tr '[:upper:]' '[:lower:]') == "yes" ]]; do
+			if [[ $transmission_port_check_attempts -ge $transmission_port_check_max_attempts ]]; then
+				echo "Port check attempts exceeded, giving up..."
+				return 1
+			else
+			 	printf "Attempt %s of %s. Port is not open yet, waiting 10 seconds...\n" $(( $transmission_port_check_attempts + 1 )) $transmission_port_check_max_attempts
+				((transmission_port_check_attempts++))
+				sleep $transmission_port_check_interval
+			fi
+		done
+		echo "Port is open!"
 	else
 		echo "No action needed, port hasn't changed"
 	fi
 }
 
-# Check that natpmpc is inatalled.
+# Check that natpmpc is installed.
 
 which natpmpc 2>/dev/null
 if [ $? -gt 0 ]; then
@@ -77,26 +89,29 @@ echo "natpmpc installed and executable."
 # the following is largely based on the instructions found here:
 # https://protonvpn.com/support/port-forwarding-manual-setup/#linux
 #
-
-natpmpc -a 1 0 udp 60 -g 10.2.0.1
-natpmpc -a 1 0 tcp 60 -g 10.2.0.1
 while true; do
 	date
 	cmdoutput=$(natpmpc -a 1 0 udp 60 -g 10.2.0.1 && natpmpc -a 1 0 tcp 60 -g 10.2.0.1 || {
 		echo -e "ERROR with natpmpc command \a"
 		break
 	})
-	pf_port=$(echo $cmdoutput | grep -Eo 'Mapped public port ([0-9]*) protocol UDP' | grep -Eo '([0-9]{5})')
+	echo "$cmdoutput"
+	pf_port=$(echo $cmdoutput | grep -Eo 'Mapped public port ([0-9]*) protocol ' | grep -Eo '([0-9]{5})' | uniq)
 	if [ -z "$pf_port" ]; then
 		echo "----------------------------"
 		echo "No port retuned from natpmpc"
 		echo "----------------------------"
 	else
-		bind_trans
-		echo "----------------------------"
-		echo "THE FORWARDED PORT IS: ${pf_port}"
-		echo "----------------------------"
+		bind_trans && {
+			echo "----------------------------"
+			echo "THE FORWARDED PORT IS: $pf_port"
+			echo "----------------------------"
+		} || {
+			echo "----------------------------"
+			echo "THE FORWARDED PORT IS: Unavailable"
+			echo "----------------------------"
+		}
 	fi
 
-	sleep 45
+	sleep 35
 done
