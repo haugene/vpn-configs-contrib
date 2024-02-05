@@ -13,23 +13,20 @@ Port forwarding for ProtonVPN has been implemented in this [update-port.sh](/ope
 
 ## Notes:
 This script has been manually tested to work with the following ProtonVPN configs that are included in this repo.:
-- ch.protonvpn.net.udp
-- es.protonvpn.net.tcp
-- es.protonvpn.net.udp
-- fr.protonvpn.net.udp
-- fr.protonvpn.net.udp
-- is.protonvpn.net.tcp
-- is.protonvpn.net.udp
-- ng.protonvpn.net.tcp
-- ng.protonvpn.net.udp
-- nl.protonvpn.net.tcp
-- nl.protonvpn.net.udp
-- ro.protonvpn.net.udp
-- ro.protonvpn.net.tcp
-- se.protonvpn.net.tcp
-- se.protonvpn.net.udp
-- uk.protonvpn.net.udp
-- us.protonvpn.net.udp
+- ch.protonvpn.udp
+- es.protonvpn.tcp
+- es.protonvpn.udp
+- fr.protonvpn.udp
+- fr.protonvpn.udp
+- is.protonvpn.tcp
+- is.protonvpn.udp
+- nl.protonvpn.tcp
+- nl.protonvpn.udp
+- ro.protonvpn.udp
+- ro.protonvpn.tcp
+- se.protonvpn.tcp
+- se.protonvpn.udp
+- uk.protonvpn.udp
 
 ## Environment Variables for transmission-openvpn
 ```
