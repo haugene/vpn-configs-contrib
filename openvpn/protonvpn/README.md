@@ -33,7 +33,7 @@ This script has been manually tested to work with the following ProtonVPN config
 environment:
   - PUID=[PUID]
   - PGID=[PGID]
-  - OPENVPN_CONFIG=us.protonvpn.udp
+  - OPENVPN_CONFIG=uk.protonvpn.udp
   - OPENVPN_PROVIDER=PROTONVPN
   - OPENVPN_USERNAME=[OpenVPN / IKEv2 username] # See here: https://account.protonvpn.com/account
   - OPENVPN_PASSWORD=[OpenVPN / IKEv2 password] # See here: https://account.protonvpn.com/account
