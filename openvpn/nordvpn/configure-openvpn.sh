@@ -7,7 +7,7 @@
 #
 # NORDVPN_COUNTRY: code or name
 # curl -s "https://api.nordvpn.com/v1/servers/countries" | jq --raw-output '.[] | [.code, .name] | @tsv'
-# NORDVPN_PROTOCOL: tcp or upd, tcp if none or unknown. Many technologies are not used as only openvpn_udp and openvpn_tcp are tested.
+# NORDVPN_PROTOCOL: tcp or udp, tcp if none or unknown. Many technologies are not used as only openvpn_udp and openvpn_tcp are tested.
 # Will request api with openvpn_<NORDVPN_PROTOCOL>.
 # curl -s "https://api.nordvpn.com/v1/technologies" | jq --raw-output '.[] | [.identifier, .name ] | @tsv' | grep openvpn
 # NORDVPN_CATEGORY: default p2p. not all countries have all combination of NORDVPN_PROTOCOL(technologies) and NORDVPN_CATEGORY(groups),
@@ -192,7 +192,13 @@ download_hostname() {
 }
 
 checkDNS() {
-  res=$(dig +short ${nordvpn_dl})
+  if [ -z "${HEALTH_CHECK_HOST}" ]; then
+    checkServer=${nordvpn_dl}
+  else
+    checkServer=${HEALTH_CHECK_HOST}
+    log "Checking DNS using server ${checkServer}"
+  fi
+  res=$(dig +short ${checkServer})
   if [ -z "${res:-\"\"}" ]; then
     log "DNS: ERROR, no dns resolution, dns server unavailable or network problem"
   else
@@ -201,9 +207,9 @@ checkDNS() {
   ping -c2 ${nordvpn_dl} 2>&1 >/dev/null
   ret=$?
   if [ $ret -eq 0 ]; then
-    log "PING: ok, configurations download site reachable"
+    log "PING: ok"
   else
-    log "PING: ERROR: cannot ping ${nordvpn_cdn}, network or internet unavailable. Cannot download NORDVPN configuration files"
+    log "PING: ERROR: cannot ping ${checkServer}, network or internet unavailable. Cannot download NORDVPN configuration files"
   fi
   return $ret
 }

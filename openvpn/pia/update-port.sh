@@ -46,6 +46,12 @@ get_sig () {
     echo "$(date): getSignature error"
     echo $pf_getsig
     echo "the has been a fatal_error"
+    echo "#######################"
+    echo "        ERROR        "
+    echo "#######################"
+    echo "Please make sure that your selected server supports port forwarding"
+    echo "If it does not, please select a server that does, or set DISABLE_PORT_UPDATER=true"
+    exit
   fi
   pf_payload=$(echo $pf_getsig | jq -r .payload)
   pf_getsignature=$(echo $pf_getsig | jq -r .signature)
