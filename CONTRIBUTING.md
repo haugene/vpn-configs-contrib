@@ -1,6 +1,10 @@
 # Adding your own config files
 
-Contributing to this repository means helping out keeping all the config files up to date.
+This file is called "contributing" but it is really about using a new configuration, and a side 
+effect of that when you use one of the described idioms below is that you can contribute your
+config file back to the community.
+
+Contributing to this repository means helping to keep all the config files up to date.
 We're assuming that you do this because you use the Docker image `haugene/transmission-openvpn` and
 you're lacking some configs or you want to update them because the provider has changed them.
 All other uses of this repo is concidered "special interest" for now and will not be covered here.
@@ -19,7 +23,7 @@ This is steps you need to take in addition to that. So here we go.
 
 This is the "add my own config" for dummies. Feel free to propose changes here to make it even simpler.
 
-## Case 1: You have a config file (.ovpn) locally and you want to use it with the container
+## Case 1: You have a config file (.ovpn) and you can publish/contribute it to the public
 
 On the GitHub page for this config repository (assuming you're logged in):
 
@@ -55,6 +59,42 @@ Good luck!
 Some providers have their certificates and keys as separate files and just reference them in the .ovpn file.
 In these cases do step 3 again and add these files as well. Keep the file names like they are in your config bundle.
 
-## Case 2: What do you want?
+## Case 2: You have one or more config files (.ovpn) and you want keep them private
 
-Is there another common use case you want a guide for? Open an issue or make it yourself and open a pull-request :)
+Some VPN providers do not use a username-password pair to authenticate your computer to their services, but instead
+embed a cryptographic key in the configuration that is unique to you. It would be inadvisable to share that key on
+the internet in a publicly-accessable github repo.
+
+Instead, you can store the ovpn file(s) *next to* your docker-compose.yaml or Dockerfile, and ask the docker system
+to provide that file in a place that the configuiration system can find and understand. (You can store them
+elsewhere, but you have to adjust the relative filename `./` below to refer to your chosen location.)
+
+Since we're providing our own file, we don't need to adhere to the "OPENVPN_PROVIDER" choices in the image or in the
+configuration repo and we have liberty to nominate our own provider. Let's use a name that we have confidence will
+not be claimed by a future service, `-local-`, and pick names to represent the configuration names. (It is okay to
+have only one!)
+
+You should store your configuration on disk with some descriptive filename, like "AirVPN_America_UDP-443.ovpn",
+which we'll need in the "volumes" configuration of docker-compose.yaml for your transmission service. This will be
+marked as "your local filename". Note, the "configuration" name does not have ".ovpn" on the end, but the "file" 
+name will.
+
+You add a volume with that filename, mapping it to a configuration name inside your docker container, e.g.,
+
+```yaml
+#... inside the haugene/transmission-openvpn stanza
+    volumes:
+#...
+      - "./AirVPN_America_UDP-443.ovpn:/config/vpn-configs-contrib/openvpn/-local-/alice-cred-airvpn-america-udp.ovpn:ro"
+      - "./AirVPN_America_TDP-443.ovpn:/config/vpn-configs-contrib/openvpn/-local-/alice-crede-airvpn-america-tcp.ovpn:ro"
+      - "./AirVPN_Europe_UDP-443.ovpn:/config/vpn-configs-contrib/openvpn/-local-/alice-cred-airvpn-europe-udp.ovpn:ro"
+#          ^---Your local filenames-^                                             ^-----Your config names----^ ^no!
+#        ^^  dot slash represents that the OpenVPN config files are in the same directory as your docker-compose.yaml 
+
+    environment:
+#...
+      - "OPENVPN_PROVIDER=-local-"
+#                         ^-----^  This is required to be set to construct destination filename(s) above.
+      - "OPENVPN_CONFIG=alice-credential-airvpn-america-udp,alice-credential-airvpn-america-tcp,alice-credential-airvpn-europe-udp"
+#                       ^----Your configuration names-----^+...
+```
