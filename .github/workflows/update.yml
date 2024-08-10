@@ -1,0 +1,20 @@
+name: update config files
+
+on:
+  workflow_call:
+  schedule: # run script every day
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          ./openvpn/updateConfigs.sh
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update config files
