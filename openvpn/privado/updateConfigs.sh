@@ -23,3 +23,13 @@ sed -i "s/auth-user-pass/auth-user-pass \/config\/openvpn-credentials.txt/" *.ov
 
 # Create symlink for default.ovpn
 ln -s ams-005.ovpn default.ovpn
+
+# Remove existing default symlinks (XXX.ovpn)
+rm -f ???.ovpn
+
+# Link default config for each server (ams-XXX.ovpn -> ams.ovpn)
+for f in *.ovpn; do
+	if [ ! -e "${f:0:3}.ovpn" ]; then
+		ln -sf "$f" "${f:0:3}.ovpn"
+	fi
+done
