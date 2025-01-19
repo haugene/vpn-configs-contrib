@@ -21,15 +21,6 @@ for f in *.default.ovpn; do mv -- "$f" "${f%.default.ovpn}.ovpn"; done
 # Update configs with correct paths
 sed -i "s/auth-user-pass/auth-user-pass \/config\/openvpn-credentials.txt/" *.ovpn
 
-# Create symlink for default.ovpn
-ln -s ams-005.ovpn default.ovpn
-
-# Remove existing default symlinks (XXX.ovpn)
-rm -f ???.ovpn
-
-# Link default config for each server (ams-XXX.ovpn -> ams.ovpn)
-for f in *.ovpn; do
-	if [ ! -e "${f:0:3}.ovpn" ]; then
-		ln -sf "$f" "${f:0:3}.ovpn"
-	fi
-done
+# Create symlink for default.ovpn using the first ams-XXX.ovpn file
+files=(ams-*.ovpn)
+ln -sf "${files[1]}" default.ovpn
