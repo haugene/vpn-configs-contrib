@@ -28,88 +28,52 @@ remote() {
     fi
 }
 
-# this function borrowed from openvpn/pia/update-port.sh
 bind_trans() {
-    new_port=$pf_port
-    local transmission_port_check_max_attempts=50
-    local transmission_port_check_attempts=0
-    local transmission_port_check_interval=10
-    #
-    # Now, set port in Transmission
-    #
+    local new_port=$pf_port
 
     # Check if transmission remote is set up with authentication
     if test "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true"; then
-        echo "transmission auth required"
         myauth="$transmission_username:$transmission_passwd"
     else
-        echo "transmission auth not required"
         myauth=""
     fi
 
-    # make sure transmission is running and accepting requests
-    echo "waiting for transmission to become responsive"
+    # Ensure transmission is responsive
     until test "$(remote --list | jq -r .result)" == "success"; do sleep 10; done
-    echo "transmission became responsive"
 
-    # get current listening port
+    # Bind port to Transmission
     transmission_peer_port=$(remote --session-info | jq -r '.arguments["peer-port"]')
     if test "$new_port" -ne "$transmission_peer_port"; then
-        if test "$ENABLE_UFW" == "true"; then
-            echo "Update UFW rules before changing port in Transmission"
-
-            echo "denying access to $transmission_peer_port"
-            ufw deny "$transmission_peer_port"
-
-            echo "allowing $new_port through the firewall"
-            ufw allow "$new_port"
-        fi
-
-        echo "setting transmission port to $new_port"
         until test "$(remote --port "$new_port" | jq -r .result)" == "success"; do sleep 5; done
-
-        echo "Waiting for port..."
-        until test "$(remote --port-test | jq -r '.arguments["port-is-open"]')" == "true"; do
-            if test $transmission_port_check_attempts -ge $transmission_port_check_max_attempts; then
-                echo "Port check attempts exceeded, giving up..."
-                return 1
-            else
-                printf "Attempt %d of %d. Port is not open yet, waiting %d seconds...\n" $(( transmission_port_check_attempts + 1 )) $transmission_port_check_max_attempts $transmission_port_check_interval
-                ((transmission_port_check_attempts++))
-                sleep $transmission_port_check_interval
-            fi
-        done
-        echo "Port is open!"
-    else
-        echo "No action needed, port hasn't changed"
     fi
 }
 
 if ! which jq; then
-    echo "jq is not installed."
-    exit 1
-fi
-
-if ! which natpmpc; then
-    echo "natpmpc is not installed. natpmpc is required to configure ProtonVPN port forwarding."
+    echo "jq is not installed! jq is required to configure ProtonVPN port forwarding."
     echo "port forwarding for ProtonVPN has not been configured."
     exit 1
 fi
 
+if ! which natpmpc; then
+    echo "natpmpc is not installed! natpmpc is required to configure ProtonVPN port forwarding."
+    echo "port forwarding for ProtonVPN has not been configured."
+    exit 1
+fi
+
+sleep 60
 box_out "ProtonVPN Port Forwarding"
+last_known_port=""
 
 while true; do
-    date
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if test "$pf_port" -gt 1024; then
-        if bind_trans; then
+        if [[ "$pf_port" != "$last_known_port" ]]; then
+            bind_trans
+            last_known_port="$pf_port"
             box_out "The Forwarded Port is: $pf_port"
-        else
-            box_out "The Forwarded Port is: Unavailable"
         fi
     else
-        box_out "No Port Retuned from natpmpc"
+        box_out "No valid port returned from natpmpc"
     fi
-
-    sleep 35
+    sleep 45
 done
