@@ -27,4 +27,4 @@ echo "Extract OpenVPN config bundle into PIA directory $VPN_PROVIDER_HOME"
 unzip -qjo "$tmp_file" -d "$VPN_PROVIDER_HOME"
 
 # Select a random server as default.ovpn
-ln -sf "$(find "$VPN_PROVIDER_HOME" -name "*.ovpn" | shuf -n 1)" "$VPN_PROVIDER_HOME"/default.ovpn
+ln -sf "$(find "$VPN_PROVIDER_HOME" -name "*.ovpn" | sed -n "$[ $RANDOM % $(find "$VPN_PROVIDER_HOME" -name "*.ovpn" | wc -l)]p")" "$VPN_PROVIDER_HOME"/default.ovpn
