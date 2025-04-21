@@ -44,6 +44,16 @@ bind_trans() {
     # Bind port to Transmission
     transmission_peer_port=$(remote --session-info | jq -r '.arguments["peer-port"]')
     if test "$new_port" -ne "$transmission_peer_port"; then
+        if test "$ENABLE_UFW" == "true"; then
+            echo "Update UFW rules before changing port in Transmission"
+
+            echo "denying access to $transmission_peer_port"
+            ufw deny "$transmission_peer_port"
+
+            echo "allowing $new_port through the firewall"
+            ufw allow "$new_port"
+        fi
+
         until test "$(remote --port "$new_port" | jq -r .result)" == "success"; do sleep 5; done
     fi
 }
