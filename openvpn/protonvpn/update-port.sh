@@ -31,34 +31,29 @@ remote() {
 }
 
 bind_trans() {
-    # Ensure transmission is responsive
-    for attempt in {1..3}; do
-        if test "$(remote --list | jq -r .result)" == "success"; then
-            break
-        fi
-        sleep 5
-        if [ "$attempt" -eq 3 ]; then
-            return 1
-        fi
-    done
-
-    # Bind port to Transmission
-    if test "$pf_port" -ne "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
-        for attempt in {1..3}; do
-            if test "$(remote --port "$pf_port" | jq -r .result)" == "success"; then
-                sleep 1
-                if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
-                    return 0
-                else
-                    box_out "Command to change port from $last_port to $pf_port returned success but actually failed!"
-                fi
-            fi
-            sleep 5
-        done
+    # Ensure Transmission is responsive
+    if test "$(remote --list | jq -r .result)" != "success"; then
         return 1
     fi
 
-    return 0
+    # Check if already bound to Transmission
+    if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+        return 0
+    fi
+
+    # Bind port to Transmission
+    if test "$(remote --port "$pf_port" | jq -r .result)" != "success"; then
+        return 1
+    fi
+    sleep 1
+
+    # Verify that port was bound to Transmission
+    if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+        return 0
+    fi
+
+    box_out "Command to change port from $last_port to $pf_port returned success but actually failed!"
+    return 1
 }
 
 if ! which jq; then
