@@ -36,7 +36,7 @@ bind_trans() {
         return 1
     fi
 
-    # Check if already bound to Transmission
+    # Check if port is already bound to Transmission
     if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
         return 0
     fi
