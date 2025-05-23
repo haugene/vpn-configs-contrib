@@ -19,7 +19,7 @@ function box_out() {
 }
 
 open_port() {
-    timeout 10 natpmpc -a 1 0 udp 60 && timeout 10 natpmpc -a 1 0 tcp 60
+    timeout 5 natpmpc -a 1 0 udp 60 > /dev/null 2>&1 && timeout 5 natpmpc -a 1 0 tcp 60
 }
 
 remote() {
@@ -90,7 +90,7 @@ last_port="unset"
 
 while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    if test "$pf_port" -gt 1024; then
+    if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
         if [[ "$pf_port" != "$last_port" ]]; then
             if bind_trans; then
                 last_port="$pf_port"
