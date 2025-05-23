@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+sleep 60
+
 set -euo pipefail
 
 # shellcheck source=/dev/null
@@ -17,35 +19,46 @@ function box_out() {
 }
 
 open_port() {
-    natpmpc -a 1 0 udp 60 && natpmpc -a 1 0 tcp 60
+    timeout 5 natpmpc -a 1 0 udp 60 > /dev/null 2>&1 && timeout 5 natpmpc -a 1 0 tcp 60
 }
 
 remote() {
     if test -n "$myauth"; then
-        transmission-remote "$TRANSMISSION_RPC_PORT" --auth "$myauth" --json "$@"
+        timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --auth "$myauth" --json "$@"
     else
-        transmission-remote "$TRANSMISSION_RPC_PORT" --json "$@"
+        timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --json "$@"
     fi
 }
 
 bind_trans() {
-    local new_port=$pf_port
-
-    # Check if transmission remote is set up with authentication
-    if test "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true"; then
-        myauth="$transmission_username:$transmission_passwd"
-    else
-        myauth=""
-    fi
-
     # Ensure transmission is responsive
-    until test "$(remote --list | jq -r .result)" == "success"; do sleep 10; done
+    for attempt in {1..3}; do
+        if test "$(remote --list | jq -r .result)" == "success"; then
+            break
+        fi
+        sleep 5
+        if [ "$attempt" -eq 3 ]; then
+            return 1
+        fi
+    done
 
     # Bind port to Transmission
-    transmission_peer_port=$(remote --session-info | jq -r '.arguments["peer-port"]')
-    if test "$new_port" -ne "$transmission_peer_port"; then
-        until test "$(remote --port "$new_port" | jq -r .result)" == "success"; do sleep 5; done
+    if test "$pf_port" -ne "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+        for attempt in {1..3}; do
+            if test "$(remote --port "$pf_port" | jq -r .result)" == "success"; then
+                sleep 1
+                if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+                    return 0
+                else
+                    box_out "Command to change port from $last_port to $pf_port returned success but actually failed!"
+                fi
+            fi
+            sleep 5
+        done
+        return 1
     fi
+
+    return 0
 }
 
 if ! which jq; then
@@ -60,17 +73,31 @@ if ! which natpmpc; then
     exit 1
 fi
 
-sleep 60
+tr_cmd=$(command -v transmission-remote)
+if [[ -z "$tr_cmd" ]]; then
+    echo "Error: transmission-remote not found in PATH"
+    exit 1
+fi
+
+if test "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true"; then
+    myauth="$transmission_username:$transmission_passwd"
+else
+    myauth=""
+fi
+
 box_out "ProtonVPN Port Forwarding"
-last_known_port=""
+last_port="unset"
 
 while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    if test "$pf_port" -gt 1024; then
-        if [[ "$pf_port" != "$last_known_port" ]]; then
-            bind_trans
-            last_known_port="$pf_port"
-            box_out "The Forwarded Port is: $pf_port"
+    if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
+        if [[ "$pf_port" != "$last_port" ]]; then
+            if bind_trans; then
+                last_port="$pf_port"
+                box_out "The forwarded port is: $pf_port"
+            else
+                box_out "Attempt to change port from $last_port to $pf_port failed!"
+            fi
         fi
     else
         box_out "No valid port returned from natpmpc"
