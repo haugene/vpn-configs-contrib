@@ -61,13 +61,13 @@ bind_trans() {
     return 0
 }
 
-if ! timeout 5 which jq; then
+if ! which jq; then
     echo "jq is not installed! jq is required to configure ProtonVPN port forwarding."
     echo "port forwarding for ProtonVPN has not been configured."
     exit 1
 fi
 
-if ! timeout 5 which natpmpc; then
+if ! which natpmpc; then
     echo "natpmpc is not installed! natpmpc is required to configure ProtonVPN port forwarding."
     echo "port forwarding for ProtonVPN has not been configured."
     exit 1
