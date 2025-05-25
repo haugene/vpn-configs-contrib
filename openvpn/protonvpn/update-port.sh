@@ -2,7 +2,10 @@
 
 sleep 60
 
-set -euo pipefail
+# Disabled exiting on errors to allow the script to keep running even if commands fail
+set +e
+set +u
+set +o pipefail
 
 # shellcheck source=/dev/null
 . /etc/transmission/environment-variables.sh
@@ -12,6 +15,14 @@ TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
 transmission_username=$(head -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_passwd=$(tail -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
+
+debug=false
+
+echo_debug() {
+    if [ "$debug" = true ]; then
+        echo "[DEBUG] $*"
+    fi
+}
 
 function box_out() {
     local s="$*"
@@ -85,6 +96,7 @@ last_port="unset"
 
 while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
+    echo_debug "Current detected port: $pf_port"
     if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
         if [[ "$pf_port" != "$last_port" ]]; then
             if bind_trans; then
