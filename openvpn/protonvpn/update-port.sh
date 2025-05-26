@@ -16,14 +16,6 @@ transmission_username=$(head -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_passwd=$(tail -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
 
-debug=false
-
-echo_debug() {
-    if [ "$debug" = true ]; then
-        echo "[DEBUG] $*"
-    fi
-}
-
 function box_out() {
     local s="$*"
     printf "\033[36m╭─%s─╮\n\033[36m│ \033[34m%s\033[36m │\n\033[36m╰─%s─╯\033[0;39m\n" "${s//?/─}" "$s" "${s//?/─}"
@@ -96,7 +88,6 @@ last_port="unset"
 
 while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    echo_debug "Current detected port: $pf_port"
     if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
         if [[ "$pf_port" != "$last_port" ]]; then
             if bind_trans; then
