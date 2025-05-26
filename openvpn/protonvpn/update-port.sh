@@ -83,7 +83,7 @@ fi
 box_out "ProtonVPN Port Forwarding"
 last_port="unset"
 
-# Disabled exiting on errors to allow the script to keep running even if commands fail
+# Disable exiting on errors to allow the script to keep running even if commands fail
 set +e
 
 while true; do
