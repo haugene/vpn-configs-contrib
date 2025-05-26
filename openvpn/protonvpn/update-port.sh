@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 
 sleep 60
-
 set -euo pipefail
 
 # shellcheck source=/dev/null
 . /etc/transmission/environment-variables.sh
 
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
-
 transmission_username=$(head -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_passwd=$(tail -1 ${TRANSMISSION_PASSWD_FILE})
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
