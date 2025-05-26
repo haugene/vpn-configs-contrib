@@ -4,8 +4,7 @@ sleep 60
 
 # Disabled exiting on errors to allow the script to keep running even if commands fail
 set +e
-set +u
-set +o pipefail
+set -uo pipefail
 
 # shellcheck source=/dev/null
 . /etc/transmission/environment-variables.sh
