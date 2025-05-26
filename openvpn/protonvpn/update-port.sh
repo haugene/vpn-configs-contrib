@@ -2,9 +2,7 @@
 
 sleep 60
 
-# Disabled exiting on errors to allow the script to keep running even if commands fail
-set +e
-set -uo pipefail
+set -euo pipefail
 
 # shellcheck source=/dev/null
 . /etc/transmission/environment-variables.sh
@@ -84,6 +82,9 @@ fi
 
 box_out "ProtonVPN Port Forwarding"
 last_port="unset"
+
+# Disabled exiting on errors to allow the script to keep running even if commands fail
+set +e
 
 while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
