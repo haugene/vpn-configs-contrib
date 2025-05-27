@@ -75,9 +75,7 @@ set_firewall() {
 
         # Allow new port
         if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
-            if timeout 5 ufw status | grep -qw "$pf_port"; then
-                echo "Port $pf_port is already allowed in the firewall. No action needed."
-            else
+            if ! (timeout 5 ufw status | grep -qw "$pf_port"); then
                 echo "Allowing $pf_port through the firewall"
                 if ! timeout 5 ufw allow "$pf_port"; then
                     echo "Failed while allowing port $pf_port"
