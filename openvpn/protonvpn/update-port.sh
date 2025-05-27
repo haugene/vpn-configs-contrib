@@ -62,24 +62,26 @@ bind_trans() {
 }
 
 set_firewall() {
-    if test "$ENABLE_UFW" == "true"; then
-        # Deny old port
-        if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$pf_port" != "$last_port" ]]; then
-            if timeout 5 ufw status | grep -qw "$last_port"; then
-                echo "Denying $last_port through the firewall"
-                if ! timeout 5 ufw deny "$last_port"; then
-                    echo "Failed while denying port $last_port"
-                fi
+    if test "$ENABLE_UFW" != "true"; then
+        return 0
+    fi
+
+    # Deny old port
+    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$pf_port" != "$last_port" ]]; then
+        if timeout 5 ufw status | grep -qw "$last_port"; then
+            echo "Denying $last_port through the firewall"
+            if ! timeout 5 ufw deny "$last_port"; then
+                echo "Failed while denying port $last_port"
             fi
         fi
+    fi
 
-        # Allow new port
-        if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
-            if ! (timeout 5 ufw status | grep -qw "$pf_port"); then
-                echo "Allowing $pf_port through the firewall"
-                if ! timeout 5 ufw allow "$pf_port"; then
-                    echo "Failed while allowing port $pf_port"
-                fi
+    # Allow new port
+    if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
+        if ! (timeout 5 ufw status | grep -qw "$pf_port"); then
+            echo "Allowing $pf_port through the firewall"
+            if ! timeout 5 ufw allow "$pf_port"; then
+                echo "Failed while allowing port $pf_port"
             fi
         fi
     fi
