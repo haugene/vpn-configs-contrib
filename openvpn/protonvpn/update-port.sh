@@ -34,6 +34,7 @@ bind_trans() {
         return 1
     fi
 
+    # Set last port if unset
     if test "$last_port" == "unset"; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
         if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
