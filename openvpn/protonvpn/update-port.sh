@@ -7,11 +7,11 @@ set -euo pipefail
 . /etc/transmission/environment-variables.sh
 
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
-transmission_username=$(head -1 ${TRANSMISSION_PASSWD_FILE})
-transmission_passwd=$(tail -1 ${TRANSMISSION_PASSWD_FILE})
+transmission_username=$(head -1 "${TRANSMISSION_PASSWD_FILE}")
+transmission_passwd=$(tail -1 "${TRANSMISSION_PASSWD_FILE}")
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
 
-function box_out() {
+box_out() {
     local s="$*"
     printf "\033[36m╭─%s─╮\n\033[36m│ \033[34m%s\033[36m │\n\033[36m╰─%s─╯\033[0;39m\n" "${s//?/─}" "$s" "${s//?/─}"
 }
@@ -34,6 +34,13 @@ bind_trans() {
         return 1
     fi
 
+    if test "$last_port" == "unset"; then
+        last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
+        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
+            last_port="unset"
+        fi
+    fi
+
     # Check if port is already bound to Transmission
     if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
         return 0
@@ -54,13 +61,37 @@ bind_trans() {
     return 1
 }
 
-if ! which jq; then
+set_firewall() {
+    if test "$ENABLE_UFW" == "true"; then
+        # Deny old port
+        if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$pf_port" != "$last_port" ]]; then
+            if timeout 5 ufw status | grep -qw "$last_port"; then
+                echo "Denying $last_port through the firewall"
+                if ! timeout 5 ufw deny "$last_port"; then
+                    echo "Failure while denying port $last_port"
+                fi
+            fi
+        fi
+
+        # Allow new port
+        if timeout 5 ufw status | grep -qw "$pf_port"; then
+            echo "Port $pf_port is already allowed in the firewall. No action needed."
+        else
+            echo "Allowing $pf_port through the firewall"
+            if ! timeout 5 ufw allow "$pf_port"; then
+                echo "Failure while allowing port $pf_port"
+            fi
+        fi
+    fi
+}
+
+if ! command -v jq > /dev/null 2>&1; then
     echo "jq is not installed! jq is required to configure ProtonVPN port forwarding."
     echo "port forwarding for ProtonVPN has not been configured."
     exit 1
 fi
 
-if ! which natpmpc; then
+if ! command -v natpmpc > /dev/null 2>&1; then
     echo "natpmpc is not installed! natpmpc is required to configure ProtonVPN port forwarding."
     echo "port forwarding for ProtonVPN has not been configured."
     exit 1
@@ -95,6 +126,7 @@ while true; do
                 box_out "Attempt to change port from $last_port to $pf_port failed!"
             fi
         fi
+        set_firewall
     else
         box_out "No valid port returned from natpmpc"
     fi
