@@ -138,6 +138,8 @@ while true; do
                     box_out "Attempt to change port from $current_port to $new_port failed!"
                 fi
             fi
+        else
+            double_check="true"
         fi
         set_firewall
     else
