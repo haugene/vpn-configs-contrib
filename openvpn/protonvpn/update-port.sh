@@ -34,7 +34,7 @@ bind_trans() {
         return 1
     fi
 
-    # Set last port if unset
+    # Set last_port if unset
     if test "$last_port" == "unset"; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
         if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
@@ -43,22 +43,22 @@ bind_trans() {
     fi
 
     # Check if port is already bound to Transmission
-    if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+    if test "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
         return 0
     fi
 
     # Bind port to Transmission
-    if test "$(remote --port "$pf_port" | jq -r .result)" != "success"; then
+    if test "$(remote --port "$new_port" | jq -r .result)" != "success"; then
         return 1
     fi
     sleep 1
 
     # Verify that port was bound to Transmission
-    if test "$pf_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+    if test "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
         return 0
     fi
 
-    box_out "Command to change port from $last_port to $pf_port returned success but actually failed!"
+    box_out "Command to change port from $last_port to $new_port returned success but actually failed!"
     return 1
 }
 
@@ -68,7 +68,7 @@ set_firewall() {
     fi
 
     # Deny old port
-    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$new_port" != "$last_port" ]]; then
+    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$current_port" != "$last_port" ]]; then
         if timeout 5 ufw status | grep -qw "$last_port"; then
             echo "Denying $last_port through the firewall"
             if ! timeout 5 ufw deny "$last_port"; then
@@ -78,11 +78,11 @@ set_firewall() {
     fi
 
     # Allow new port
-    if [[ "$new_port" =~ ^[0-9]+$ ]] && test "$new_port" -gt 1024; then
-        if ! (timeout 5 ufw status | grep -qw "$new_port"); then
-            echo "Allowing $new_port through the firewall"
-            if ! timeout 5 ufw allow "$new_port"; then
-                echo "Failed while allowing port $new_port"
+    if [[ "$current_port" =~ ^[0-9]+$ ]] && test "$current_port" -gt 1024; then
+        if ! (timeout 5 ufw status | grep -qw "$current_port"); then
+            echo "Allowing $current_port through the firewall"
+            if ! timeout 5 ufw allow "$current_port"; then
+                echo "Failed while allowing port $current_port"
             fi
         fi
     fi
@@ -114,26 +114,26 @@ fi
 
 box_out "ProtonVPN Port Forwarding"
 last_port="unset"
-new_port="unset"
+current_port="unset"
 double_check="false"
 
 # Disable exiting on errors to allow the script to keep running even if commands fail
 set +e
 
 while true; do
-    pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
-        if [[ "$pf_port" != "$last_port" ]]; then
+    new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
+    if [[ "$new_port" =~ ^[0-9]+$ ]] && test "$new_port" -gt 1024; then
+        if [[ "$new_port" != "$last_port" ]]; then
             if test "$double_check" == "true"; then
                 double_check="false"
             else
                 if bind_trans; then
-                    if test "$new_port" != "unset"; then
-                        last_port="$new_port"
+                    if test "$current_port" != "unset"; then
+                        last_port="$current_port"
                     fi
-                    new_port="$pf_port"
+                    current_port="$new_port"
                     double_check="true"
-                    box_out "The forwarded port is: $new_port"
+                    box_out "The forwarded port is: $current_port"
                 else
                     box_out "Attempt to change port from $last_port to $new_port failed!"
                 fi
