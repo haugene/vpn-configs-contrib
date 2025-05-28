@@ -37,7 +37,9 @@ bind_trans() {
     # Set last_port if unset
     if test "$last_port" == "unset"; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
-        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
+        if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024; then
+            current_port="$last_port"
+        else
             last_port="unset"
         fi
     fi
@@ -58,7 +60,7 @@ bind_trans() {
         return 0
     fi
 
-    box_out "Command to change port from $last_port to $new_port returned success but actually failed!"
+    box_out "Command to change port from $current_port to $new_port returned success but actually failed!"
     return 1
 }
 
@@ -128,14 +130,12 @@ while true; do
                 double_check="false"
             else
                 if bind_trans; then
-                    if test "$current_port" != "unset"; then
-                        last_port="$current_port"
-                    fi
+                    last_port="$current_port"
                     current_port="$new_port"
                     double_check="true"
                     box_out "The forwarded port is: $current_port"
                 else
-                    box_out "Attempt to change port from $last_port to $new_port failed!"
+                    box_out "Attempt to change port from $current_port to $new_port failed!"
                 fi
             fi
         fi
