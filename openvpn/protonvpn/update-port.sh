@@ -58,7 +58,7 @@ bind_trans() {
         return 0
     fi
 
-    box_out "Command to change port from $current_port to $new_port returned success but actually failed!"
+    box_out "Command to change port to $new_port returned success but actually failed!"
     return 1
 }
 
@@ -137,7 +137,7 @@ while true; do
                     double_check="true"
                     box_out "The forwarded port is: $current_port"
                 else
-                    box_out "Attempt to change port from $current_port to $new_port failed!"
+                    box_out "Attempt to change port to $new_port failed!"
                 fi
             fi
         fi
