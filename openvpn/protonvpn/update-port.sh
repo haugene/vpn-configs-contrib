@@ -37,7 +37,9 @@ bind_trans() {
     # Set last port if unset
     if test "$last_port" == "unset"; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
-        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
+        if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024; then
+            new_port="$last_port"
+        else
             last_port="unset"
         fi
     fi
@@ -68,7 +70,7 @@ set_firewall() {
     fi
 
     # Deny old port
-    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$pf_port" != "$last_port" ]]; then
+    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$new_port" != "$last_port" ]]; then
         if timeout 5 ufw status | grep -qw "$last_port"; then
             echo "Denying $last_port through the firewall"
             if ! timeout 5 ufw deny "$last_port"; then
@@ -78,11 +80,11 @@ set_firewall() {
     fi
 
     # Allow new port
-    if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
-        if ! (timeout 5 ufw status | grep -qw "$pf_port"); then
-            echo "Allowing $pf_port through the firewall"
-            if ! timeout 5 ufw allow "$pf_port"; then
-                echo "Failed while allowing port $pf_port"
+    if [[ "$new_port" =~ ^[0-9]+$ ]] && test "$new_port" -gt 1024; then
+        if ! (timeout 5 ufw status | grep -qw "$new_port"); then
+            echo "Allowing $new_port through the firewall"
+            if ! timeout 5 ufw allow "$new_port"; then
+                echo "Failed while allowing port $new_port"
             fi
         fi
     fi
@@ -114,6 +116,8 @@ fi
 
 box_out "ProtonVPN Port Forwarding"
 last_port="unset"
+new_port="unset"
+double_check="false"
 
 # Disable exiting on errors to allow the script to keep running even if commands fail
 set +e
@@ -122,11 +126,17 @@ while true; do
     pf_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if [[ "$pf_port" =~ ^[0-9]+$ ]] && test "$pf_port" -gt 1024; then
         if [[ "$pf_port" != "$last_port" ]]; then
-            if bind_trans; then
-                last_port="$pf_port"
-                box_out "The forwarded port is: $pf_port"
+            if test "$double_check" == "true"; then
+                double_check="false"
             else
-                box_out "Attempt to change port from $last_port to $pf_port failed!"
+                if bind_trans; then
+                    last_port="$new_port"
+                    new_port="$pf_port"
+                    double_check="true"
+                    box_out "The forwarded port is: $new_port"
+                else
+                    box_out "Attempt to change port from $last_port to $new_port failed!"
+                fi
             fi
         fi
         set_firewall
