@@ -123,14 +123,12 @@ set +e
 while true; do
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if [[ "$new_port" =~ ^[0-9]+$ ]] && test "$new_port" -gt 1024; then
-        if [[ "$new_port" != "$last_port" ]]; then
+        if [[ "$new_port" != "$current_port" ]]; then
             if test "$double_check" == "true"; then
                 double_check="false"
             else
                 if bind_trans; then
-                    if test "$current_port" == "unset"; then
-                        last_port="$new_port"
-                    else
+                    if test "$current_port" != "unset"; then
                         last_port="$current_port"
                     fi
                     current_port="$new_port"
