@@ -128,7 +128,9 @@ while true; do
                 double_check="false"
             else
                 if bind_trans; then
-                    if test "$current_port" != "unset"; then
+                    if test "$current_port" == "unset"; then
+                        last_port="$new_port"
+                    else
                         last_port="$current_port"
                     fi
                     current_port="$new_port"
