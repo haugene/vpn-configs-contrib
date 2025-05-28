@@ -21,7 +21,7 @@ open_port() {
 }
 
 remote() {
-    if test -n "$myauth"; then
+    if [[ -n "$myauth" ]]; then
         timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --auth "$myauth" --json "$@"
     else
         timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --json "$@"
@@ -30,31 +30,31 @@ remote() {
 
 bind_trans() {
     # Ensure Transmission is responsive
-    if test "$(remote --list | jq -r .result)" != "success"; then
+    if [[ "$(remote --list | jq -r .result)" != "success" ]]; then
         return 1
     fi
 
     # Set last_port if unset
-    if test "$last_port" == "unset"; then
+    if [[ "$last_port" == "unset" ]]; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
-        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024); then
+        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && [[ "$last_port" -gt 1024 ]]); then
             last_port="unset"
         fi
     fi
 
     # Check if port is already bound to Transmission
-    if test "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+    if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
         return 0
     fi
 
     # Bind port to Transmission
-    if test "$(remote --port "$new_port" | jq -r .result)" != "success"; then
+    if [[ "$(remote --port "$new_port" | jq -r .result)" != "success" ]]; then
         return 1
     fi
     sleep 1
 
     # Verify that port was bound to Transmission
-    if test "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"; then
+    if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
         return 0
     fi
 
@@ -63,12 +63,12 @@ bind_trans() {
 }
 
 set_firewall() {
-    if test "$ENABLE_UFW" != "true"; then
+    if [[ "$ENABLE_UFW" != "true" ]]; then
         return 0
     fi
 
     # Deny old port
-    if [[ "$last_port" =~ ^[0-9]+$ ]] && test "$last_port" -gt 1024 && [[ "$current_port" != "$last_port" ]]; then
+    if [[ "$last_port" =~ ^[0-9]+$ ]] && [[ "$last_port" -gt 1024 ]] && [[ "$current_port" != "$last_port" ]]; then
         if timeout 5 ufw status | grep -qw "$last_port"; then
             echo "Denying $last_port through the firewall"
             if ! timeout 5 ufw deny "$last_port"; then
@@ -78,7 +78,7 @@ set_firewall() {
     fi
 
     # Allow new port
-    if [[ "$current_port" =~ ^[0-9]+$ ]] && test "$current_port" -gt 1024; then
+    if [[ "$current_port" =~ ^[0-9]+$ ]] && [[ "$current_port" -gt 1024 ]]; then
         if ! (timeout 5 ufw status | grep -qw "$current_port"); then
             echo "Allowing $current_port through the firewall"
             if ! timeout 5 ufw allow "$current_port"; then
@@ -106,7 +106,7 @@ if [[ -z "$tr_cmd" ]]; then
     exit 1
 fi
 
-if test "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true"; then
+if [[ "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true" ]]; then
     myauth="$transmission_username:$transmission_passwd"
 else
     myauth=""
@@ -122,13 +122,15 @@ set +e
 
 while true; do
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    if [[ "$new_port" =~ ^[0-9]+$ ]] && test "$new_port" -gt 1024; then
-        if [[ "$new_port" != "$current_port" ]]; then
-            if test "$double_check" == "true"; then
+    if [[ "$new_port" =~ ^[0-9]+$ ]] && [[ "$new_port" -gt 1024 ]]; then
+        if [[ "$new_port" == "$current_port" ]]; then
+            double_check="true"
+        else
+            if [[ "$double_check" == "true" ]]; then
                 double_check="false"
             else
                 if bind_trans; then
-                    if test "$current_port" != "unset"; then
+                    if [[ "$current_port" != "unset" ]]; then
                         last_port="$current_port"
                     fi
                     current_port="$new_port"
@@ -138,8 +140,6 @@ while true; do
                     box_out "Attempt to change port from $current_port to $new_port failed!"
                 fi
             fi
-        else
-            double_check="true"
         fi
         set_firewall
     else
