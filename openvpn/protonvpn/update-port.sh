@@ -37,7 +37,7 @@ bind_trans() {
     # Set last_port if unset
     if [[ "$last_port" == "unset" ]]; then
         last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
-        if ! ([[ "$last_port" =~ ^[0-9]+$ ]] && [[ "$last_port" -gt 1024 ]]); then
+        if ! [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 ]]; then
             last_port="unset"
         fi
     fi
@@ -68,7 +68,7 @@ set_firewall() {
     fi
 
     # Deny old port
-    if [[ "$last_port" =~ ^[0-9]+$ ]] && [[ "$last_port" -gt 1024 ]] && [[ "$current_port" != "$last_port" ]]; then
+    if [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 && "$current_port" != "$last_port" ]]; then
         if timeout 5 ufw status | grep -qw "$last_port"; then
             echo "Denying $last_port through the firewall"
             if ! timeout 5 ufw deny "$last_port"; then
@@ -78,7 +78,7 @@ set_firewall() {
     fi
 
     # Allow new port
-    if [[ "$current_port" =~ ^[0-9]+$ ]] && [[ "$current_port" -gt 1024 ]]; then
+    if [[ "$current_port" =~ ^[0-9]+$ && "$current_port" -gt 1024 ]]; then
         if ! (timeout 5 ufw status | grep -qw "$current_port"); then
             echo "Allowing $current_port through the firewall"
             if ! timeout 5 ufw allow "$current_port"; then
@@ -122,7 +122,7 @@ set +e
 
 while true; do
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
-    if [[ "$new_port" =~ ^[0-9]+$ ]] && [[ "$new_port" -gt 1024 ]]; then
+    if [[ "$new_port" =~ ^[0-9]+$ && "$new_port" -gt 1024 ]]; then
         if [[ "$new_port" == "$current_port" ]]; then
             double_check="true"
         else
