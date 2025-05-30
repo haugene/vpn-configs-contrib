@@ -51,9 +51,9 @@ bind_trans() {
     if [[ "$(remote --port "$new_port" | jq -r .result)" != "success" ]]; then
         return 1
     fi
-    sleep 1
 
     # Verify that port was bound to Transmission
+    sleep 1
     if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
         return 0
     fi
