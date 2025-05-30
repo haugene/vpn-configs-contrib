@@ -57,7 +57,6 @@ bind_trans() {
     if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
         return 0
     fi
-
     box_out "Command to change port to $new_port returned success but actually failed!"
     return 1
 }
