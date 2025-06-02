@@ -122,12 +122,8 @@ set +e
 while true; do
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if [[ "$new_port" =~ ^[0-9]+$ && "$new_port" -gt 1024 ]]; then
-        if [[ "$new_port" == "$current_port" ]]; then
-            double_check="true"
-        else
-            if [[ "$double_check" == "true" ]]; then
-                double_check="false"
-            else
+        if [[ "$new_port" != "$current_port" ]]; then
+            if [[ "$double_check" != "true" ]]; then
                 if bind_trans; then
                     if [[ "$current_port" != "unset" ]]; then
                         last_port="$current_port"
@@ -138,7 +134,11 @@ while true; do
                 else
                     box_out "Attempt to change port to $new_port failed!"
                 fi
+            else
+                double_check="false"
             fi
+        else
+            double_check="true"
         fi
         set_firewall
     else
