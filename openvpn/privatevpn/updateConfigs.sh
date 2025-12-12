@@ -158,5 +158,5 @@ ln -sf "./dedicated/US New York 4.ovpn" "new-york-usa-allportfwd.ovpn"
 ln -sf "./dedicated/SE Stockholm.ovpn" "stockholm-sweden-allportfwd.ovpn"
 ln -sf "SE Stockholm.ovpn" "stockholm-sweden.ovpn"
 
-# Create default link matching previous
-ln -sf "SE Stockholm.ovpn" "default.ovpn"
+# Create default link to Switzerland Zurich (responds to ping)
+ln -sf "CH Zurich.ovpn" "default.ovpn"
