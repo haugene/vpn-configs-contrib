@@ -4,7 +4,7 @@ shopt -s globstar
 
 # Link might be updated, originally found on support page:
 # https://privatevpn.com/support/getting-started/miscellaneous/openvpn/openvpn-configurations-files
-PVPN_CONFIGS_URL="https://privatevpn.com/client/PrivateVPN-TUN.zip"
+PVPN_CONFIGS_URL="https://ovpnstorage.privatevpn.com/PrivateVPN-TUN.zip"
 
 # From PrivateVPN support as of 4/11/2020
 KNOWN_DEDICATED_IP_SERVERS_LIST=$(cat <<EOF
