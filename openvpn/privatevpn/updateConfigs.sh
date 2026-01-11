@@ -80,7 +80,7 @@ mkdir -p tcp \
 	forwarding
 
 # Download/unpack PrivateVPN configs
-curl -sOJL "$PVPN_CONFIGS_URL"
+curl -kOJL "$PVPN_CONFIGS_URL"
 unzip -qo -d extracted *.zip
 
 # Copy original PrivateVPN configuration files
@@ -89,7 +89,7 @@ find ./extracted -name '*-TUN-443.ovpn' -exec cp {} ./tcp/ \;
 
 # Cleanup original PrivateVPN configs
 rm -f *.zip
-rm -rf extracted
+sudo rm -rf extracted
 
 # Make config names more human-friendly
 for file in **/*.ovpn; do
