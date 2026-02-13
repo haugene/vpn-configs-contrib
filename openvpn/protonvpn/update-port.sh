@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+echo -e "$(date '+%Y-%m-%d %T')\tStarting update port script in 60 seconds"
 sleep 60
 set -euo pipefail
 
