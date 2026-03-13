@@ -96,7 +96,7 @@ fi
 
 if ! command -v natpmpc > /dev/null 2>&1; then
     echo "natpmpc not found – installing now..."
-    apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq natpmpc
+    apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq natpmpc >/dev/null 2>&1
     if ! command -v natpmpc > /dev/null 2>&1; then
         echo "Failed to install natpmpc! natpmpc is required to configure ProtonVPN port forwarding."
         echo "Port forwarding for ProtonVPN has not been configured."
