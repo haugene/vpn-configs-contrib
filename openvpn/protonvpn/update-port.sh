@@ -95,9 +95,14 @@ if ! command -v jq > /dev/null 2>&1; then
 fi
 
 if ! command -v natpmpc > /dev/null 2>&1; then
-    echo "natpmpc is not installed! natpmpc is required to configure ProtonVPN port forwarding."
-    echo "port forwarding for ProtonVPN has not been configured."
-    exit 1
+    echo "natpmpc not found – installing now..."
+    apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq natpmpc
+    if ! command -v natpmpc > /dev/null 2>&1; then
+        echo "Failed to install natpmpc! natpmpc is required to configure ProtonVPN port forwarding."
+        echo "Port forwarding for ProtonVPN has not been configured."
+        exit 1
+    fi
+    echo "natpmpc has been successfully installed."
 fi
 
 tr_cmd=$(command -v transmission-remote)
