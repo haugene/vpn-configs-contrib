@@ -17,6 +17,23 @@ box_out() {
     printf "\033[36m╭─%s─╮\n\033[36m│ \033[34m%s\033[36m │\n\033[36m╰─%s─╯\033[0;39m\n" "${s//?/─}" "$s" "${s//?/─}"
 }
 
+install_package() {
+    if command -v "$1" > /dev/null 2>&1; then
+        echo "Updating $1..."
+        apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
+        return 0
+    fi
+    echo "$1 not found – installing now..."
+    apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
+    if ! command -v "$1" > /dev/null 2>&1; then
+        echo "Failed to install $1! $1 is required to configure ProtonVPN port forwarding."
+        echo "Port forwarding for ProtonVPN has not been configured."
+        return 1
+    fi
+    echo "$1 has been successfully installed."
+    return 0
+}
+
 open_port() {
     timeout 5 natpmpc -a 1 0 udp 60 > /dev/null 2>&1 && timeout 5 natpmpc -a 1 0 tcp 60
 }
@@ -63,7 +80,7 @@ bind_trans() {
 }
 
 set_firewall() {
-    if [[ "$ENABLE_UFW" != "true" ]]; then
+    if [[ "${ENABLE_UFW,,}" != "true" ]]; then
         return 0
     fi
 
@@ -88,21 +105,11 @@ set_firewall() {
     fi
 }
 
-if ! command -v jq > /dev/null 2>&1; then
-    echo "jq is not installed! jq is required to configure ProtonVPN port forwarding."
-    echo "port forwarding for ProtonVPN has not been configured."
-    exit 1
-fi
-
-if ! command -v natpmpc > /dev/null 2>&1; then
-    echo "natpmpc not found – installing now..."
-    apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq natpmpc >/dev/null 2>&1
-    if ! command -v natpmpc > /dev/null 2>&1; then
-        echo "Failed to install natpmpc! natpmpc is required to configure ProtonVPN port forwarding."
-        echo "Port forwarding for ProtonVPN has not been configured."
-        exit 1
-    fi
-    echo "natpmpc has been successfully installed."
+# Install packages if they are not already installed
+install_package natpmpc || exit 1
+install_package jq || exit 1
+if [[ "${ENABLE_UFW,,}" == "true" ]]; then
+    install_package ufw || exit 1
 fi
 
 tr_cmd=$(command -v transmission-remote)
