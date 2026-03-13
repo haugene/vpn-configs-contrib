@@ -124,15 +124,12 @@ else
     myauth=""
 fi
 
-box_out "ProtonVPN Port Forwarding"
+new_port="unset"
 last_port="unset"
 current_port="unset"
 double_check="false"
 
-# Disable exiting on errors to allow the script to keep running even if commands fail
-set +e
-
-while true; do
+update_port() {
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if [[ "$new_port" =~ ^[0-9]+$ && "$new_port" -gt 1024 ]]; then
         if [[ "$new_port" != "$current_port" ]]; then
@@ -157,5 +154,14 @@ while true; do
     else
         box_out "No valid port returned from natpmpc"
     fi
+}
+
+# Disable exiting on errors to allow the script to keep running even if commands fail
+set +e
+
+box_out "ProtonVPN Port Forwarding"
+
+while true; do
+    update_port
     sleep 45
 done
