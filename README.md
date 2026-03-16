@@ -24,7 +24,7 @@ So the structure becomes:
 
 For example:
 ```
-openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
+openvpn/privatevpn/forwarding/UK London.ovpn
 ```
 
 ## Providers and status of configs
@@ -52,7 +52,6 @@ openvpn/mullvad/tcp80/mullvad_ch_tcp80.ovpn
 | ironsocket | :ok: (80%) | 10 | 8 |
 | ivacy | :white_check_mark: (90%) | 10 | 9 |
 | ivpn | :100: | 10 | 10 |
-| mullvad | :ok: (70%) | 10 | 7 |
 | octanevpn | :ok: (70%) | 10 | 7 |
 | ovpn | :ok: (80%) | 10 | 8 |
 | privado | :ok: (70%) | 10 | 7 |
