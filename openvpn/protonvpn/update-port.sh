@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-echo -e "$(date '+%Y-%m-%d %T')\tStarting update port script in 60 seconds"
-sleep 60
+echo -e "$(date '+%Y-%m-%d %T')\tWaiting for healthcheck to pass before updating ports..."
+while ! /etc/scripts/healthcheck.sh; do
+    echo -e "$(date '+%Y-%m-%d %T')\tNot healthy yet for port update. Retrying in 5 seconds..."
+    sleep 5
+done
+echo -e "$(date '+%Y-%m-%d %T')\tHealthcheck passed! Starting port update in 5 seconds..."
+sleep 5
 set -euo pipefail
 
 # shellcheck source=/dev/null
@@ -19,8 +24,8 @@ box_out() {
 
 install_package() {
     if command -v "$1" > /dev/null 2>&1; then
-        echo "Updating $1..."
-        apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
+        #echo "Updating $1..."
+        #apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
         return 0
     fi
     echo "$1 not found – installing now..."
