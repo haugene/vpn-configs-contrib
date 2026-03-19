@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-echo "update-port: Waiting for healthcheck to pass before updating ports..."
+echo -e "update-port:\tWaiting for healthcheck to pass before updating ports..."
 while ! /etc/scripts/healthcheck.sh; do
-    echo "update-port: Not healthy yet. Retrying in 5 seconds..."
+    echo -e "update-port:\tNot healthy yet. Retrying in 5 seconds..."
     sleep 5
-    echo "update-port: Retrying healthcheck..."
+    echo -e "update-port:\tRetrying healthcheck..."
 done
-echo "update-port: Healthcheck passed! Starting port update..."
+echo -e "update-port:\tHealthcheck passed! Starting port update..."
 set -euo pipefail
 
 # shellcheck source=/dev/null
@@ -24,18 +24,18 @@ box_out() {
 
 install_package() {
     if command -v "$1" > /dev/null 2>&1; then
-        #echo "update-port: Updating $1..."
+        #echo -e "update-port:\tUpdating $1..."
         #apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
         return 0
     fi
-    echo "update-port: $1 not found – installing now..."
+    echo -e "update-port:\t$1 not found – installing now..."
     apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq "$1" >/dev/null 2>&1
     if ! command -v "$1" > /dev/null 2>&1; then
-        echo "update-port: Failed to install $1! $1 is required to configure ProtonVPN port forwarding."
-        echo "update-port: Port forwarding for ProtonVPN has not been configured."
+        echo -e "update-port:\tFailed to install $1! $1 is required to configure ProtonVPN port forwarding."
+        echo -e "update-port:\tPort forwarding for ProtonVPN has not been configured."
         return 1
     fi
-    echo "update-port: $1 has been successfully installed."
+    echo -e "update-port:\t$1 has been successfully installed."
     return 0
 }
 
@@ -92,9 +92,9 @@ set_firewall() {
     # Deny old port
     if [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 && "$current_port" != "$last_port" ]]; then
         if timeout 5 ufw status | grep -qw "$last_port"; then
-            echo "update-port: Denying $last_port through the firewall"
+            echo -e "update-port:\tDenying $last_port through the firewall"
             if ! timeout 5 ufw deny "$last_port"; then
-                echo "update-port: Failed while denying port $last_port"
+                echo -e "update-port:\tFailed while denying port $last_port"
             fi
         fi
     fi
@@ -102,9 +102,9 @@ set_firewall() {
     # Allow new port
     if [[ "$current_port" =~ ^[0-9]+$ && "$current_port" -gt 1024 ]]; then
         if ! (timeout 5 ufw status | grep -qw "$current_port"); then
-            echo "update-port: Allowing $current_port through the firewall"
+            echo -e "update-port:\tAllowing $current_port through the firewall"
             if ! timeout 5 ufw allow "$current_port"; then
-                echo "update-port: Failed while allowing port $current_port"
+                echo -e "update-port:\tFailed while allowing port $current_port"
             fi
         fi
     fi
@@ -119,7 +119,7 @@ fi
 
 tr_cmd=$(command -v transmission-remote)
 if [[ -z "$tr_cmd" ]]; then
-    echo "update-port: Error: transmission-remote not found in PATH"
+    echo -e "update-port:\tError: transmission-remote not found in PATH"
     exit 1
 fi
 
