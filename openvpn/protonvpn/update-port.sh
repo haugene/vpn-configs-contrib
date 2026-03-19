@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-echo -e "$(date '+%Y-%m-%d %T')\tWaiting for healthcheck to pass before updating ports..."
+echo "Waiting for healthcheck to pass before updating ports..."
 while ! /etc/scripts/healthcheck.sh; do
-    echo -e "$(date '+%Y-%m-%d %T')\tNot healthy yet for port update. Retrying in 5 seconds..."
+    echo "Not healthy yet for port update. Retrying in 5 seconds..."
     sleep 5
 done
-echo -e "$(date '+%Y-%m-%d %T')\tHealthcheck passed! Starting port update in 5 seconds..."
+echo "Healthcheck passed! Starting port update in 5 seconds..."
 sleep 5
 set -euo pipefail
 
