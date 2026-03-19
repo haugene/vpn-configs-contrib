@@ -9,11 +9,10 @@ while ! /etc/scripts/healthcheck.sh; do
     log "Retrying healthcheck..."
 done
 log "Healthcheck passed! Starting port update..."
+
 set -euo pipefail
 
-# shellcheck source=/dev/null
 . /etc/transmission/environment-variables.sh
-
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
 transmission_username=$(head -1 "${TRANSMISSION_PASSWD_FILE}")
 transmission_passwd=$(tail -1 "${TRANSMISSION_PASSWD_FILE}")
