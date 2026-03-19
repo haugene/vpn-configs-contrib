@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+sleep 5
 echo "Waiting for healthcheck to pass before updating ports..."
 while ! /etc/scripts/healthcheck.sh; do
     echo "Not healthy yet for port update. Retrying in 5 seconds..."
