@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-log() { echo -e "update-port:\t$1"; }
-
-log "Waiting for healthcheck to pass before updating ports..."
-while ! /etc/scripts/healthcheck.sh; do
-    log "Not healthy yet. Retrying in 5 seconds..."
-    sleep 5
-    log "Retrying healthcheck..."
-done
-log "Healthcheck passed! Starting port update..."
-
 set -euo pipefail
 
 . /etc/transmission/environment-variables.sh
@@ -17,6 +7,13 @@ TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
 transmission_username=$(head -1 "${TRANSMISSION_PASSWD_FILE}")
 transmission_passwd=$(tail -1 "${TRANSMISSION_PASSWD_FILE}")
 transmission_settings_file=${TRANSMISSION_HOME}/settings.json
+transmission_auth=""
+new_port="unset"
+last_port="unset"
+current_port="unset"
+double_check="false"
+
+log() { echo -e "update-port:\t$1"; }
 
 box_out() {
     local s="$*"
@@ -45,8 +42,8 @@ open_port() {
 }
 
 remote() {
-    if [[ -n "$myauth" ]]; then
-        timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --auth "$myauth" --json "$@"
+    if [[ -n "$transmission_auth" ]]; then
+        timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --auth "$transmission_auth" --json "$@"
     else
         timeout 5 "$tr_cmd" "$TRANSMISSION_RPC_PORT" --json "$@"
     fi
@@ -111,30 +108,6 @@ set_firewall() {
     fi
 }
 
-# Install packages if they are not already installed
-install_package natpmpc || exit 1
-install_package jq || exit 1
-if [[ "${ENABLE_UFW,,}" == "true" ]]; then
-    install_package ufw || exit 1
-fi
-
-tr_cmd=$(command -v transmission-remote)
-if [[ -z "$tr_cmd" ]]; then
-    log "Error: transmission-remote not found in PATH"
-    exit 1
-fi
-
-if [[ "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true" ]]; then
-    myauth="$transmission_username:$transmission_passwd"
-else
-    myauth=""
-fi
-
-new_port="unset"
-last_port="unset"
-current_port="unset"
-double_check="false"
-
 update_port() {
     new_port="$(open_port | sed -nr '1,//s/Mapped public port ([0-9]{4,5}) protocol.*/\1/p')"
     if [[ "$new_port" =~ ^[0-9]+$ && "$new_port" -gt 1024 ]]; then
@@ -162,10 +135,35 @@ update_port() {
     fi
 }
 
-# Disable exiting on errors to allow the script to keep running even if commands fail
-set +e
+log "Waiting for healthcheck to pass before updating ports..."
+while ! /etc/scripts/healthcheck.sh; do
+    log "Not healthy yet. Retrying in 5 seconds..."
+    sleep 5
+    log "Retrying healthcheck..."
+done
+log "Healthcheck passed! Starting port update..."
+
+# Install packages if they are not already installed
+install_package natpmpc || exit 1
+install_package jq || exit 1
+if [[ "${ENABLE_UFW,,}" == "true" ]]; then
+    install_package ufw || exit 1
+fi
+
+if [[ "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true" ]]; then
+    transmission_auth="$transmission_username:$transmission_passwd"
+fi
+
+tr_cmd=$(command -v transmission-remote)
+if [[ -z "$tr_cmd" ]]; then
+    log "Error: transmission-remote not found in PATH"
+    exit 1
+fi
 
 box_out "ProtonVPN Port Forwarding"
+
+# Disable exiting on errors to allow the script to keep running even if commands fail
+set +e
 
 while true; do
     update_port
