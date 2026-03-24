@@ -129,7 +129,6 @@ update_port() {
         else
             double_check="true"
         fi
-        set_firewall
     else
         box_out "No valid port returned from natpmpc"
     fi
@@ -167,5 +166,6 @@ set +e
 
 while true; do
     update_port
+    set_firewall
     sleep 45
 done
