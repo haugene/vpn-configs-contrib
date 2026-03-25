@@ -4,11 +4,8 @@ Port forwarding for ProtonVPN has been implemented in this [update-port.sh](/ope
 
 ## Requirements:
 - an account with ProtonVPN
-- a build of haugene/docker-transmission-openvpn that has natpmpc installed.
-  - The dev branch of haugene/docker-transmission-docker has the natpmpc install. As of 2023-11-19, it is not yet in the master branch and/or the published image.
-  - If your transmission container does not have natpmpc then transmission will still work - you just will not be using port-forwarding.
-  - The brave may manually install natpmpc inside their transmission-openvpn container.
-  - The less brave will need to wait until the published image of docker-transmission-openvpn has natpmpc.
+- haugene/docker-transmission-openvpn v5.4.1 or later, which includes natpmpc.
+  - If your transmission container is using an older version without natpmpc then transmission will still work - you just will not be using port-forwarding.
 
 
 ## Notes:
