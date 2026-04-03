@@ -6,8 +6,8 @@ if [[ -z "$VPN_PROVIDER_HOME" ]]; then
 fi
 
 # Download & extract ovpn files from provider
-URL="https://support.vyprvpn.com/hc/article_attachments/360052617332"
-PACKAGE="Vypr_OpenVPN_20200320.zip"
+URL="https://support.vyprvpn.com/hc/article_attachments/44585865394189"
+PACKAGE="VyprVPN_OpenVPN_2026-03-06_256-bit.zip"
 OUTPUT="/tmp/VyprVPN.zip"
 
 download_extract () {
