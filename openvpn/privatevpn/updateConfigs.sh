@@ -110,6 +110,7 @@ sed -i 's/\r$//g' **/*.ovpn
 
 # Remove unwanted OVPN options
 sed -i "/tun-ipv6/d" **/*.ovpn
+sed -i "/ncp-disable/d" **/*.ovpn
 
 # Add wanted OVPN options
 sed -i '/verb 3/a\
