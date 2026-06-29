@@ -2,7 +2,7 @@
 
 set -e
 
-baseURL="https://configs.ipvanish.com/configs"
+baseURL="https://configs.ipvanish.com/openvpn/v2.6.0-0/"
 CONFIG_BUNDLE="configs.zip"
 
 if [ -z "$VPN_PROVIDER_HOME" ]; then
