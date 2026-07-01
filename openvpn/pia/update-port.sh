@@ -28,8 +28,7 @@ pf_host=$(ip route | grep tun | grep -v src | head -1 | awk '{ print $3 }')
 
 get_auth_token () {
             tok=$(curl --insecure --silent --show-error --request POST --max-time $curl_max_time \
-                 --header "Content-Type: application/json" \
-                 --data "{\"username\":\"$user\",\"password\":\"$pass\"}" \
+                 --form "username=$user" --form "password=$pass" \
                 "https://www.privateinternetaccess.com/api/client/v2/token" | jq -r '.token')
             [ $? -ne 0 ] && echo "Failed to acquire new auth token" && exit 1
             #echo "$tok"
