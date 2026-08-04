@@ -49,6 +49,9 @@ remote() {
     fi
 }
 
+# Reads an RPC response on stdin. Succeeds for both the pre-4.1 shape
+# ({"result":"success",...}) and the JSON-RPC 2.0 shape
+# ({"jsonrpc":"2.0","result":{...}} / {"jsonrpc":"2.0","error":{...}}).
 rpc_ok() {
     jq -e '
         if has("error") then false
@@ -59,6 +62,8 @@ rpc_ok() {
     ' > /dev/null 2>&1
 }
 
+# Echoes the current peer port, or nothing if it cannot be read.
+# Handles arguments/result nesting and peer-port/peer_port spelling.
 session_port() {
     remote --session-info | jq -r '
         [.arguments, .result]
@@ -106,19 +111,35 @@ set_firewall() {
         return 0
     fi
 
-    # Deny old port
+    local rules
+
+    # Remove any rules for the old port.
     if [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 && "$current_port" != "$last_port" ]]; then
-        if timeout 5 ufw status | grep -qw "$last_port"; then
-            log "Denying $last_port through the firewall"
-            if ! timeout 5 ufw deny "$last_port"; then
-                log "Failed while denying port $last_port"
+        rules="$(timeout 5 ufw status | grep -w "$last_port" || true)"
+        if [[ -n "$rules" ]]; then
+            log "Removing $last_port from the firewall"
+            if grep -q ALLOW <<< "$rules" && ! timeout 5 ufw delete allow "$last_port"; then
+                log "Failed while removing allow rule for port $last_port"
+            fi
+            if grep -q DENY <<< "$rules" && ! timeout 5 ufw delete deny "$last_port"; then
+                log "Failed while removing deny rule for port $last_port"
             fi
         fi
     fi
 
     # Allow new port
     if [[ "$current_port" =~ ^[0-9]+$ && "$current_port" -gt 1024 ]]; then
-        if ! (timeout 5 ufw status | grep -qw "$current_port"); then
+        rules="$(timeout 5 ufw status | grep -w "$current_port" || true)"
+
+        # A stale deny from an older version would otherwise block this port
+        if grep -q DENY <<< "$rules"; then
+            log "Removing stale deny rule for port $current_port"
+            if ! timeout 5 ufw delete deny "$current_port"; then
+                log "Failed while removing deny rule for port $current_port"
+            fi
+        fi
+
+        if ! grep -q ALLOW <<< "$rules"; then
             log "Allowing $current_port through the firewall"
             if ! timeout 5 ufw allow "$current_port"; then
                 log "Failed while allowing port $current_port"
