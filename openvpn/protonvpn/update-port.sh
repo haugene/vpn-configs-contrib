@@ -49,33 +49,52 @@ remote() {
     fi
 }
 
+rpc_ok() {
+    jq -e '
+        if has("error") then false
+        elif (.result | type) == "string" then .result == "success"
+        elif (.result | type) == "object" then true
+        else false
+        end
+    ' > /dev/null 2>&1
+}
+
+session_port() {
+    remote --session-info | jq -r '
+        [.arguments, .result]
+        | map(select(type == "object"))
+        | .[0]
+        | (.peer_port // .["peer-port"]) // empty
+    ' 2>/dev/null || true
+}
+
 bind_trans() {
     # Ensure Transmission is responsive
-    if [[ "$(remote --list | jq -r .result)" != "success" ]]; then
+    if ! remote --list | rpc_ok; then
         return 1
     fi
 
     # Set last_port if unset
     if [[ "$last_port" == "unset" ]]; then
-        last_port="$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)"
+        last_port="$(session_port)"
         if ! [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 ]]; then
             last_port="unset"
         fi
     fi
 
     # Check if port is already bound to Transmission
-    if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
+    if [[ "$(session_port)" == "$new_port" ]]; then
         return 0
     fi
 
     # Bind port to Transmission
-    if [[ "$(remote --port "$new_port" | jq -r .result)" != "success" ]]; then
+    if ! remote --port "$new_port" | rpc_ok; then
         return 1
     fi
 
     # Verify that port was bound to Transmission
     sleep 1
-    if [[ "$new_port" -eq "$(remote --session-info | jq -r '.arguments["peer-port"]' || echo 0)" ]]; then
+    if [[ "$(session_port)" == "$new_port" ]]; then
         return 0
     fi
     box_out "Command to change port to $new_port returned success but actually failed!"
@@ -149,7 +168,7 @@ if [[ "${ENABLE_UFW,,}" == "true" ]]; then
     install_package ufw || exit 1
 fi
 
-if [[ "$(jq -r '.["rpc-authentication-required"]' "$transmission_settings_file")" == "true" ]]; then
+if [[ "$(jq -r '.["rpc-authentication-required"] // .rpc_authentication_required' "$transmission_settings_file")" == "true" ]]; then
     transmission_auth="$transmission_username:$transmission_passwd"
 fi
 
