@@ -49,9 +49,7 @@ remote() {
     fi
 }
 
-# Reads an RPC response on stdin. Succeeds for both the pre-4.1 shape
-# ({"result":"success",...}) and the JSON-RPC 2.0 shape
-# ({"jsonrpc":"2.0","result":{...}} / {"jsonrpc":"2.0","error":{...}}).
+# Accepts both the pre-4.1 and JSON-RPC 2.0 response shapes.
 rpc_ok() {
     jq -e '
         if has("error") then false
@@ -62,7 +60,6 @@ rpc_ok() {
     ' > /dev/null 2>&1
 }
 
-# Echoes the current peer port, or nothing if it cannot be read.
 # Handles arguments/result nesting and peer-port/peer_port spelling.
 session_port() {
     remote --session-info | jq -r '
