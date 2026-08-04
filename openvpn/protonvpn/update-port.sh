@@ -126,6 +126,7 @@ set_firewall() {
 
     # Allow new port
     if [[ "$current_port" =~ ^[0-9]+$ && "$current_port" -gt 1024 ]]; then
+
         # A stale deny from an older version would otherwise block this port
         if timeout 5 ufw status | grep -w "$current_port" | grep -q DENY; then
             log "Removing stale deny rule for port $current_port"
