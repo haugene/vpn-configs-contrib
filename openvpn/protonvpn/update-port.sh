@@ -103,11 +103,6 @@ bind_trans() {
     return 1
 }
 
-# True if ufw holds a rule of the given type (ALLOW/DENY) for the given port.
-ufw_has() {
-    timeout 5 ufw status | grep -w "$1" | grep -q "$2"
-}
-
 set_firewall() {
     if [[ "${ENABLE_UFW,,}" != "true" ]]; then
         return 0
@@ -115,13 +110,13 @@ set_firewall() {
 
     # Remove any rules for the old port.
     if [[ "$last_port" =~ ^[0-9]+$ && "$last_port" -gt 1024 && "$current_port" != "$last_port" ]]; then
-        if ufw_has "$last_port" ALLOW; then
+        if timeout 5 ufw status | grep -w "$last_port" | grep -q ALLOW; then
             log "Removing allow rule for port $last_port"
             if ! timeout 5 ufw delete allow "$last_port"; then
                 log "Failed while removing allow rule for port $last_port"
             fi
         fi
-        if ufw_has "$last_port" DENY; then
+        if timeout 5 ufw status | grep -w "$last_port" | grep -q DENY; then
             log "Removing deny rule for port $last_port"
             if ! timeout 5 ufw delete deny "$last_port"; then
                 log "Failed while removing deny rule for port $last_port"
@@ -132,14 +127,14 @@ set_firewall() {
     # Allow new port
     if [[ "$current_port" =~ ^[0-9]+$ && "$current_port" -gt 1024 ]]; then
         # A stale deny from an older version would otherwise block this port
-        if ufw_has "$current_port" DENY; then
+        if timeout 5 ufw status | grep -w "$current_port" | grep -q DENY; then
             log "Removing stale deny rule for port $current_port"
             if ! timeout 5 ufw delete deny "$current_port"; then
                 log "Failed while removing deny rule for port $current_port"
             fi
         fi
 
-        if ! ufw_has "$current_port" ALLOW; then
+        if ! timeout 5 ufw status | grep -w "$current_port" | grep -q ALLOW; then
             log "Allowing $current_port through the firewall"
             if ! timeout 5 ufw allow "$current_port"; then
                 log "Failed while allowing port $current_port"
