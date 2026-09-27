@@ -11,7 +11,7 @@ ENABLE_UFW="${ENABLE_UFW:-false}"
 TRANSMISSION_RPC_PORT="${TRANSMISSION_RPC_PORT:-9091}"
 TRANSMISSION_HOME="${TRANSMISSION_HOME:-/config/transmission-home}"
 ENABLE_PORT_CHECK="${ENABLE_PORT_CHECK:-false}"
-PORT_CHECK_PUBLIC_IP_URL="${PORT_CHECK_PUBLIC_IP_URL:-https://api.ipify.org}"
+PUBLIC_IP_URL="${PUBLIC_IP_URL:-https://api.ipify.org}"
 
 # Use the RPC login from the environment when set, otherwise the OpenVPN image's credentials file
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
@@ -227,7 +227,7 @@ check_port() {
             check_port_first_fail="false"
             local pmp_ip ext_ip
             pmp_ip=$(timeout 5 natpmpc -g 10.2.0.1 2>/dev/null | sed -nr 's/.*[Pp]ublic IP address *: *([0-9.]+).*/\1/p' | head -1)
-            ext_ip=$(curl -4 -s --fail --max-time 10 "$PORT_CHECK_PUBLIC_IP_URL" 2>/dev/null | tr -d '[:space:]')
+            ext_ip=$(curl -4 -s --fail --max-time 10 "$PUBLIC_IP_URL" 2>/dev/null | tr -d '[:space:]')
             [[ "$ext_ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || ext_ip=""
             if [[ -z "$ext_ip" ]]; then
                 log "IP mismatch check skipped: could not determine outbound IP"
