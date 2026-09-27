@@ -11,7 +11,6 @@ ENABLE_UFW="${ENABLE_UFW:-false}"
 TRANSMISSION_RPC_PORT="${TRANSMISSION_RPC_PORT:-9091}"
 TRANSMISSION_HOME="${TRANSMISSION_HOME:-/config/transmission-home}"
 ENABLE_PORT_CHECK="${ENABLE_PORT_CHECK:-false}"
-PUBLIC_IP_URL="${PUBLIC_IP_URL:-https://api.ipify.org}"
 
 # Use the RPC login from the environment when set, otherwise the OpenVPN image's credentials file
 TRANSMISSION_PASSWD_FILE=/config/transmission-credentials.txt
@@ -203,6 +202,22 @@ update_port() {
     fi
 }
 
+get_public_ip() {
+    local service="${PUBLIC_IP_URL:-https://ipecho.net/plain}"
+    if [[ ! "$service" =~ ^https?:// ]]; then
+        echo "INVALID_SERVICE_URL"
+        return 0
+    fi
+    local ip=$(curl -4 -s --fail --max-time 10 "$service" 2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$ip" ]]; then
+        echo "NO_RESPONSE_FROM_SERVICE"
+    elif [[ ! "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        echo "INVALID_RESPONSE_FORMAT"
+    else
+        echo "$ip"
+    fi
+}
+
 check_port() {
     if [[ "${ENABLE_PORT_CHECK,,}" != "true" ]]; then
         return 0
@@ -227,7 +242,7 @@ check_port() {
             check_port_first_fail="false"
             local pmp_ip ext_ip
             pmp_ip=$(timeout 5 natpmpc -g 10.2.0.1 2>/dev/null | sed -nr 's/.*[Pp]ublic IP address *: *([0-9.]+).*/\1/p' | head -1)
-            ext_ip=$(curl -4 -s --fail --max-time 10 "$PUBLIC_IP_URL" 2>/dev/null | tr -d '[:space:]')
+            ext_ip=$(get_public_ip)
             [[ "$ext_ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || ext_ip=""
             if [[ -z "$ext_ip" ]]; then
                 log "IP mismatch check skipped: could not determine outbound IP"
